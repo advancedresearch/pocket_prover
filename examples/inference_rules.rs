@@ -36,7 +36,7 @@ fn main() {
         ),
         imply(p, r)
     )));
-    println!("  disjuctive-syllogism: {}", prove2(|p, q| imply(
+    println!("  disjunctive-syllogism: {}", prove2(|p, q| imply(
         and(
             or(p, q),
             not(p),
@@ -51,7 +51,7 @@ fn main() {
         and(p, q),
         p
     )));
-    println!("  conjuction: {}", prove2(|p, q| imply(
+    println!("  conjunction: {}", prove2(|p, q| imply(
         and(
             p,
             q,
