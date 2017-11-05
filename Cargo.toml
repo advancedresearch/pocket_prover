@@ -2,5 +2,12 @@
 name = "pocket_prover"
 version = "0.1.0"
 authors = ["Sven Nilsen <bvssvni@gmail.com>"]
+keywords = ["prover", "solver", "logic", "first-order"]
+description = "A fast, bounded, brute force, automatic theorem prover for first order logic"
+license = "MIT"
+repository = "https://github.com/advancedresearch/pocket_prover.git"
+homepage = "https://github.com/advancedresearch/pocket_prover"
+documentation = "https://docs.rs/pocket_prover"
+readme = "README.md"
 
 [dependencies]
