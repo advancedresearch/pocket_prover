@@ -36,6 +36,6 @@ fn main() {
     }));
     println!("");
     println!("Actually, we are only asserting that true implies true.");
-    println!("Still, the same thing happens for all proofs");
-    println!("It just becomes clearer when the proofs depends on no variables.");
+    println!("Still, the same thing happens for all proofs.");
+    println!("It just becomes clearer when the proof depends on no variables.");
 }
