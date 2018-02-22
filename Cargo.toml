@@ -1,9 +1,9 @@
 [package]
 name = "pocket_prover"
-version = "0.3.1"
+version = "0.3.2"
 authors = ["Sven Nilsen <bvssvni@gmail.com>"]
 keywords = ["prover", "solver", "logic", "first-order"]
-description = "A fast, bounded, brute force, automatic theorem prover for first order logic"
+description = "A fast, brute force, automatic theorem prover for first order logic"
 license = "MIT"
 repository = "https://github.com/advancedresearch/pocket_prover.git"
 homepage = "https://github.com/advancedresearch/pocket_prover"
