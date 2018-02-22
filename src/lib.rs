@@ -260,6 +260,23 @@ pub fn and10(
 ) -> u64 {
     and(and5(a, b, c, d, e), and5(f, g, h, i, j))
 }
+/// An and relation of variable number of arguments.
+pub fn andn(vs: &[u64]) -> u64 {
+    match vs.len() {
+        0 => T,
+        1 => vs[0],
+        2 => and(vs[0], vs[1]),
+        3 => and3(vs[0], vs[1], vs[2]),
+        4 => and4(vs[0], vs[1], vs[2], vs[3]),
+        5 => and5(vs[0], vs[1], vs[2], vs[3], vs[4]),
+        6 => and6(vs[0], vs[1], vs[2], vs[3], vs[4], vs[5]),
+        7 => and7(vs[0], vs[1], vs[2], vs[3], vs[4], vs[5], vs[6]),
+        8 => and8(vs[0], vs[1], vs[2], vs[3], vs[4], vs[5], vs[6], vs[7]),
+        9 => and9(vs[0], vs[1], vs[2], vs[3], vs[4], vs[5], vs[6], vs[7], vs[8]),
+        10 => and10(vs[0], vs[1], vs[2], vs[3], vs[4], vs[5], vs[6], vs[7], vs[8], vs[9]),
+        x => and(andn(&vs[..x]), andn(&vs[x..]))
+    }
+}
 
 /// An or relation of 3 arguments.
 pub fn or3(a: u64, b: u64, c: u64) -> u64 {or(or(a, b), c)}
@@ -288,82 +305,71 @@ pub fn or10(
 ) -> u64 {
     or(or5(a, b, c, d, e), or5(f, g, h, i, j))
 }
+/// An or relation of variable number of arguments.
+pub fn orn(vs: &[u64]) -> u64 {
+    match vs.len() {
+        0 => F,
+        1 => vs[0],
+        2 => or(vs[0], vs[1]),
+        3 => or3(vs[0], vs[1], vs[2]),
+        4 => or4(vs[0], vs[1], vs[2], vs[3]),
+        5 => or5(vs[0], vs[1], vs[2], vs[3], vs[4]),
+        6 => or6(vs[0], vs[1], vs[2], vs[3], vs[4], vs[5]),
+        7 => or7(vs[0], vs[1], vs[2], vs[3], vs[4], vs[5], vs[6]),
+        8 => or8(vs[0], vs[1], vs[2], vs[3], vs[4], vs[5], vs[6], vs[7]),
+        9 => or9(vs[0], vs[1], vs[2], vs[3], vs[4], vs[5], vs[6], vs[7], vs[8]),
+        10 => or10(vs[0], vs[1], vs[2], vs[3], vs[4], vs[5], vs[6], vs[7], vs[8], vs[9]),
+        x => or(orn(&vs[..x]), orn(&vs[x..]))
+    }
+}
 
 /// An xor relation of 3 arguments.
 pub fn xor3(a: u64, b: u64, c: u64) -> u64 {
-    or3(
-        and3(a, not(b), not(c)),
-        and3(not(a), b, not(c)),
-        and3(not(a), not(b), c)
+    or(
+        and(xor(a, b), not(c)),
+        not(or3(a, b, not(c)))
     )
 }
 /// An xor relation of 4 arguments.
 pub fn xor4(a: u64, b: u64, c: u64, d: u64) -> u64 {
-    or4(
-        and4(a, not(b), not(c), not(d)),
-        and4(not(a), b, not(c), not(d)),
-        and4(not(a), not(b), c, not(d)),
-        and4(not(a), not(b), not(c), d)
+    or(
+        and(xor3(a, b, c), not(d)),
+        not(or4(a, b, c, not(d)))
     )
 }
 /// An xor relation of 5 arguments.
 pub fn xor5(a: u64, b: u64, c: u64, d: u64, e: u64) -> u64 {
-    or5(
-        and5(a, not(b), not(c), not(d), not(e)),
-        and5(not(a), b, not(c), not(d), not(e)),
-        and5(not(a), not(b), c, not(d), not(e)),
-        and5(not(a), not(b), not(c), d, not(e)),
-        and5(not(a), not(b), not(c), not(d), e)
+    or(
+        and(xor4(a, b, c, d), not(e)),
+        not(or5(a, b, c, d, not(e)))
     )
 }
 /// An xor relation of 6 arguments.
 pub fn xor6(a: u64, b: u64, c: u64, d: u64, e: u64, f: u64) -> u64 {
-    or6(
-        and6(a, not(b), not(c), not(d), not(e), not(f)),
-        and6(not(a), b, not(c), not(d), not(e), not(f)),
-        and6(not(a), not(b), c, not(d), not(e), not(f)),
-        and6(not(a), not(b), not(c), d, not(e), not(f)),
-        and6(not(a), not(b), not(c), not(d), e, not(f)),
-        and6(not(a), not(b), not(c), not(d), not(e), f)
+    or(
+        and(xor5(a, b, c, d, e), not(f)),
+        not(or6(a, b, c, d, e, not(f)))
     )
 }
 /// An xor relation of 7 arguments.
 pub fn xor7(a: u64, b: u64, c: u64, d: u64, e: u64, f: u64, g: u64) -> u64 {
-    or7(
-        and7(a, not(b), not(c), not(d), not(e), not(f), not(g)),
-        and7(not(a), b, not(c), not(d), not(e), not(f), not(g)),
-        and7(not(a), not(b), c, not(d), not(e), not(f), not(g)),
-        and7(not(a), not(b), not(c), d, not(e), not(f), not(g)),
-        and7(not(a), not(b), not(c), not(d), e, not(f), not(g)),
-        and7(not(a), not(b), not(c), not(d), not(e), f, not(g)),
-        and7(not(a), not(b), not(c), not(d), not(e), not(f), g)
+    or(
+        and(xor6(a, b, c, d, e, f), not(g)),
+        not(or7(a, b, c, d, e, f, not(g)))
     )
 }
 /// An xor relation of 8 arguments.
 pub fn xor8(a: u64, b: u64, c: u64, d: u64, e: u64, f: u64, g: u64, h: u64) -> u64 {
-    or8(
-        and8(a, not(b), not(c), not(d), not(e), not(f), not(g), not(h)),
-        and8(not(a), b, not(c), not(d), not(e), not(f), not(g), not(h)),
-        and8(not(a), not(b), c, not(d), not(e), not(f), not(g), not(h)),
-        and8(not(a), not(b), not(c), d, not(e), not(f), not(g), not(h)),
-        and8(not(a), not(b), not(c), not(d), e, not(f), not(g), not(h)),
-        and8(not(a), not(b), not(c), not(d), not(e), f, not(g), not(h)),
-        and8(not(a), not(b), not(c), not(d), not(e), not(f), g, not(h)),
-        and8(not(a), not(b), not(c), not(d), not(e), not(f), not(g), h)
+    or(
+        and(xor7(a, b, c, d, e, f, g), not(h)),
+        not(or8(a, b, c, d, e, f, g, not(h)))
     )
 }
 /// An xor relation of 9 arguments.
 pub fn xor9(a: u64, b: u64, c: u64, d: u64, e: u64, f: u64, g: u64, h: u64, i: u64) -> u64 {
-    or9(
-        and9(a, not(b), not(c), not(d), not(e), not(f), not(g), not(h), not(i)),
-        and9(not(a), b, not(c), not(d), not(e), not(f), not(g), not(h), not(i)),
-        and9(not(a), not(b), c, not(d), not(e), not(f), not(g), not(h), not(i)),
-        and9(not(a), not(b), not(c), d, not(e), not(f), not(g), not(h), not(i)),
-        and9(not(a), not(b), not(c), not(d), e, not(f), not(g), not(h), not(i)),
-        and9(not(a), not(b), not(c), not(d), not(e), f, not(g), not(h), not(i)),
-        and9(not(a), not(b), not(c), not(d), not(e), not(f), g, not(h), not(i)),
-        and9(not(a), not(b), not(c), not(d), not(e), not(f), not(g), h, not(i)),
-        and9(not(a), not(b), not(c), not(d), not(e), not(f), not(g), not(h), i)
+    or(
+        and(xor8(a, b, c, d, e, f, g, h), not(i)),
+        not(or9(a, b, c, d, e, f, g, h, not(i)))
     )
 }
 /// An xor relation of 10 arguments.
@@ -371,18 +377,32 @@ pub fn xor10(
     a: u64, b: u64, c: u64, d: u64, e: u64,
     f: u64, g: u64, h: u64, i: u64, j: u64
 ) -> u64 {
-    or10(
-        and10(a, not(b), not(c), not(d), not(e), not(f), not(g), not(h), not(i), not(j)),
-        and10(not(a), b, not(c), not(d), not(e), not(f), not(g), not(h), not(i), not(j)),
-        and10(not(a), not(b), c, not(d), not(e), not(f), not(g), not(h), not(i), not(j)),
-        and10(not(a), not(b), not(c), d, not(e), not(f), not(g), not(h), not(i), not(j)),
-        and10(not(a), not(b), not(c), not(d), e, not(f), not(g), not(h), not(i), not(j)),
-        and10(not(a), not(b), not(c), not(d), not(e), f, not(g), not(h), not(i), not(j)),
-        and10(not(a), not(b), not(c), not(d), not(e), not(f), g, not(h), not(i), not(j)),
-        and10(not(a), not(b), not(c), not(d), not(e), not(f), not(g), h, not(i), not(j)),
-        and10(not(a), not(b), not(c), not(d), not(e), not(f), not(g), not(h), i, not(j)),
-        and10(not(a), not(b), not(c), not(d), not(e), not(f), not(g), not(h), not(i), j),
+    or(
+        and(xor9(a, b, c, d, e, f, g, h, i), not(j)),
+        not(or10(a, b, c, d, e, f, g, h, i, not(j)))
     )
+}
+/// An xor relation of variable number of arguments.
+pub fn xorn(vs: &[u64]) -> u64 {
+    match vs.len() {
+        0 => F,
+        1 => vs[0],
+        2 => xor(vs[0], vs[1]),
+        3 => xor3(vs[0], vs[1], vs[2]),
+        4 => xor4(vs[0], vs[1], vs[2], vs[3]),
+        5 => xor5(vs[0], vs[1], vs[2], vs[3], vs[4]),
+        6 => xor6(vs[0], vs[1], vs[2], vs[3], vs[4], vs[5]),
+        7 => xor7(vs[0], vs[1], vs[2], vs[3], vs[4], vs[5], vs[6]),
+        8 => xor8(vs[0], vs[1], vs[2], vs[3], vs[4], vs[5], vs[6], vs[7]),
+        9 => xor9(vs[0], vs[1], vs[2], vs[3], vs[4], vs[5], vs[6], vs[7], vs[8]),
+        10 => xor10(vs[0], vs[1], vs[2], vs[3], vs[4], vs[5], vs[6], vs[7], vs[8], vs[9]),
+        x => {
+            or(
+                and(xorn(&vs[..x]), not(vs[x-1])),
+                not(or(orn(&vs[..x]), not(vs[x-1])))
+            )
+        }
+    }
 }
 
 /// An imply chain of 3 arguments.
@@ -419,6 +439,25 @@ pub fn imply10(
 ) -> u64 {
     and9(imply(a, b), imply(b, c), imply(c, d), imply(d, e),
          imply(e, f), imply(f, g), imply(g, h), imply(h, i), imply(i, j))
+}
+/// An imply chain of variable number of arguments.
+pub fn implyn(vs: &[u64]) -> u64 {
+    match vs.len() {
+        0 => T,
+        1 => vs[0],
+        2 => imply(vs[0], vs[1]),
+        3 => imply3(vs[0], vs[1], vs[2]),
+        4 => imply4(vs[0], vs[1], vs[2], vs[3]),
+        5 => imply5(vs[0], vs[1], vs[2], vs[3], vs[4]),
+        6 => imply6(vs[0], vs[1], vs[2], vs[3], vs[4], vs[5]),
+        7 => imply7(vs[0], vs[1], vs[2], vs[3], vs[4], vs[5], vs[6]),
+        8 => imply8(vs[0], vs[1], vs[2], vs[3], vs[4], vs[5], vs[6], vs[7]),
+        9 => imply9(vs[0], vs[1], vs[2], vs[3], vs[4], vs[5], vs[6], vs[7], vs[8]),
+        10 => imply10(vs[0], vs[1], vs[2], vs[3], vs[4], vs[5], vs[6], vs[7], vs[8], vs[9]),
+        x => {
+            and(implyn(&vs[..x]), imply(vs[x-2], vs[x-1]))
+        }
+    }
 }
 
 /// A boolean function of one argument.
