@@ -290,33 +290,99 @@ pub fn or10(
 }
 
 /// An xor relation of 3 arguments.
-pub fn xor3(a: u64, b: u64, c: u64) -> u64 {xor(xor(a, b), c)}
+pub fn xor3(a: u64, b: u64, c: u64) -> u64 {
+    or3(
+        and3(a, not(b), not(c)),
+        and3(not(a), b, not(c)),
+        and3(not(a), not(b), c)
+    )
+}
 /// An xor relation of 4 arguments.
-pub fn xor4(a: u64, b: u64, c: u64, d: u64) -> u64 {xor(xor(a, b), xor(c, d))}
+pub fn xor4(a: u64, b: u64, c: u64, d: u64) -> u64 {
+    or4(
+        and4(a, not(b), not(c), not(d)),
+        and4(not(a), b, not(c), not(d)),
+        and4(not(a), not(b), c, not(d)),
+        and4(not(a), not(b), not(c), d)
+    )
+}
 /// An xor relation of 5 arguments.
-pub fn xor5(a: u64, b: u64, c: u64, d: u64, e: u64) -> u64 {xor(xor3(a, b, c), xor(d, e))}
+pub fn xor5(a: u64, b: u64, c: u64, d: u64, e: u64) -> u64 {
+    or5(
+        and5(a, not(b), not(c), not(d), not(e)),
+        and5(not(a), b, not(c), not(d), not(e)),
+        and5(not(a), not(b), c, not(d), not(e)),
+        and5(not(a), not(b), not(c), d, not(e)),
+        and5(not(a), not(b), not(c), not(d), e)
+    )
+}
 /// An xor relation of 6 arguments.
 pub fn xor6(a: u64, b: u64, c: u64, d: u64, e: u64, f: u64) -> u64 {
-    xor(xor3(a, b, c), xor3(d, e, f))
+    or6(
+        and6(a, not(b), not(c), not(d), not(e), not(f)),
+        and6(not(a), b, not(c), not(d), not(e), not(f)),
+        and6(not(a), not(b), c, not(d), not(e), not(f)),
+        and6(not(a), not(b), not(c), d, not(e), not(f)),
+        and6(not(a), not(b), not(c), not(d), e, not(f)),
+        and6(not(a), not(b), not(c), not(d), not(e), f)
+    )
 }
 /// An xor relation of 7 arguments.
 pub fn xor7(a: u64, b: u64, c: u64, d: u64, e: u64, f: u64, g: u64) -> u64 {
-    xor(xor4(a, b, c, d), xor3(e, f, g))
+    or7(
+        and7(a, not(b), not(c), not(d), not(e), not(f), not(g)),
+        and7(not(a), b, not(c), not(d), not(e), not(f), not(g)),
+        and7(not(a), not(b), c, not(d), not(e), not(f), not(g)),
+        and7(not(a), not(b), not(c), d, not(e), not(f), not(g)),
+        and7(not(a), not(b), not(c), not(d), e, not(f), not(g)),
+        and7(not(a), not(b), not(c), not(d), not(e), f, not(g)),
+        and7(not(a), not(b), not(c), not(d), not(e), not(f), g)
+    )
 }
 /// An xor relation of 8 arguments.
 pub fn xor8(a: u64, b: u64, c: u64, d: u64, e: u64, f: u64, g: u64, h: u64) -> u64 {
-    xor(xor4(a, b, c, d), xor4(e, f, g, h))
+    or8(
+        and8(a, not(b), not(c), not(d), not(e), not(f), not(g), not(h)),
+        and8(not(a), b, not(c), not(d), not(e), not(f), not(g), not(h)),
+        and8(not(a), not(b), c, not(d), not(e), not(f), not(g), not(h)),
+        and8(not(a), not(b), not(c), d, not(e), not(f), not(g), not(h)),
+        and8(not(a), not(b), not(c), not(d), e, not(f), not(g), not(h)),
+        and8(not(a), not(b), not(c), not(d), not(e), f, not(g), not(h)),
+        and8(not(a), not(b), not(c), not(d), not(e), not(f), g, not(h)),
+        and8(not(a), not(b), not(c), not(d), not(e), not(f), not(g), h)
+    )
 }
 /// An xor relation of 9 arguments.
 pub fn xor9(a: u64, b: u64, c: u64, d: u64, e: u64, f: u64, g: u64, h: u64, i: u64) -> u64 {
-    xor(xor5(a, b, c, d, e), xor4(f, g, h, i))
+    or9(
+        and9(a, not(b), not(c), not(d), not(e), not(f), not(g), not(h), not(i)),
+        and9(not(a), b, not(c), not(d), not(e), not(f), not(g), not(h), not(i)),
+        and9(not(a), not(b), c, not(d), not(e), not(f), not(g), not(h), not(i)),
+        and9(not(a), not(b), not(c), d, not(e), not(f), not(g), not(h), not(i)),
+        and9(not(a), not(b), not(c), not(d), e, not(f), not(g), not(h), not(i)),
+        and9(not(a), not(b), not(c), not(d), not(e), f, not(g), not(h), not(i)),
+        and9(not(a), not(b), not(c), not(d), not(e), not(f), g, not(h), not(i)),
+        and9(not(a), not(b), not(c), not(d), not(e), not(f), not(g), h, not(i)),
+        and9(not(a), not(b), not(c), not(d), not(e), not(f), not(g), not(h), i)
+    )
 }
 /// An xor relation of 10 arguments.
 pub fn xor10(
     a: u64, b: u64, c: u64, d: u64, e: u64,
     f: u64, g: u64, h: u64, i: u64, j: u64
 ) -> u64 {
-    xor(xor5(a, b, c, d, e), xor5(f, g, h, i, j))
+    or10(
+        and10(a, not(b), not(c), not(d), not(e), not(f), not(g), not(h), not(i), not(j)),
+        and10(not(a), b, not(c), not(d), not(e), not(f), not(g), not(h), not(i), not(j)),
+        and10(not(a), not(b), c, not(d), not(e), not(f), not(g), not(h), not(i), not(j)),
+        and10(not(a), not(b), not(c), d, not(e), not(f), not(g), not(h), not(i), not(j)),
+        and10(not(a), not(b), not(c), not(d), e, not(f), not(g), not(h), not(i), not(j)),
+        and10(not(a), not(b), not(c), not(d), not(e), f, not(g), not(h), not(i), not(j)),
+        and10(not(a), not(b), not(c), not(d), not(e), not(f), g, not(h), not(i), not(j)),
+        and10(not(a), not(b), not(c), not(d), not(e), not(f), not(g), h, not(i), not(j)),
+        and10(not(a), not(b), not(c), not(d), not(e), not(f), not(g), not(h), i, not(j)),
+        and10(not(a), not(b), not(c), not(d), not(e), not(f), not(g), not(h), not(i), j),
+    )
 }
 
 /// An imply chain of 3 arguments.
