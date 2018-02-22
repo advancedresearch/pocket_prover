@@ -1,7 +1,8 @@
 # pocket_prover
 A fast, bounded, brute force, automatic theorem prover for first order logic
 
-For generic automated theorem proving, see [monotonic_solver](https://github.com/advancedresearch/monotonic_solver).
+- For generic automated theorem proving, see [monotonic_solver](https://github.com/advancedresearch/monotonic_solver)
+- For a debuggable SAT solver, see [debug_sat](https://github.com/advancedresearch/debug_sat)
 
 ```rust
 extern crate pocket_prover;
