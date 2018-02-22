@@ -27,7 +27,7 @@ fn main() {
     println!("This allows us to check the proof without providing example predicates");
     println!("");
     println!("Somebody passed the exam without reading the book: {}",
-        prove4(|c, b, p, x| {
+        prove4(&mut |c, b, p, x| {
             imply(
                 and(
                     // ∃x(C(x) ∧ ¬B(x))
