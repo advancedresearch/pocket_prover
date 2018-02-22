@@ -11,7 +11,7 @@
 //! use pocket_prover::*;
 //!
 //! fn main() {
-//!     println!("Socrates is mortal: {}", prove3(|man, mortal, socrates| {
+//!     println!("Socrates is mortal: {}", prove3(&mut |man, mortal, socrates| {
 //!         // Using `imply` because we want to prove an inference rule.
 //!         imply(
 //!             // Premises.
@@ -78,35 +78,35 @@ pub const F: u64 = 0b00000000_00000000_00000000_00000000_00000000_00000000_00000
 pub const T: u64 = 0b11111111_11111111_11111111_11111111_11111111_11111111_11111111_11111111;
 
 /// Counts the number of solutions of a 1-argument boolean function.
-pub fn count1<F: Fn(u64) -> u64>(f: F) -> u32 {((f)(P0) & 0x3).count_ones()}
+pub fn count1<F: FnMut(u64) -> u64>(f: &mut F) -> u32 {((f)(P0) & 0x3).count_ones()}
 /// Counts the number of solutions of a 2-argument boolean function.
-pub fn count2<F: Fn(u64, u64) -> u64>(f: F) -> u32 {((f)(P0, P1) & 0xf).count_ones()}
+pub fn count2<F: FnMut(u64, u64) -> u64>(f: &mut F) -> u32 {((f)(P0, P1) & 0xf).count_ones()}
 /// Counts the number of solutions of a 3-argument boolean function.
-pub fn count3<F: Fn(u64, u64, u64) -> u64>(f: F) -> u32 {((f)(P0, P1, P2) & 0xff).count_ones()}
+pub fn count3<F: FnMut(u64, u64, u64) -> u64>(f: &mut F) -> u32 {((f)(P0, P1, P2) & 0xff).count_ones()}
 /// Counts the number of solutions of a 4-argument boolean function.
-pub fn count4<F: Fn(u64, u64, u64, u64) -> u64>(f: F) -> u32 {((f)(P0, P1, P2, P3) & 0xffff).count_ones()}
+pub fn count4<F: FnMut(u64, u64, u64, u64) -> u64>(f: &mut F) -> u32 {((f)(P0, P1, P2, P3) & 0xffff).count_ones()}
 /// Counts the number of solutions of a 5-argument boolean function.
-pub fn count5<F: Fn(u64, u64, u64, u64, u64) -> u64>(f: F) -> u32 {
+pub fn count5<F: FnMut(u64, u64, u64, u64, u64) -> u64>(f: &mut F) -> u32 {
     ((f)(P0, P1, P2, P3, P4) & 0xffff_ffff).count_ones()
 }
 /// Counts the number of solutions of a 6-argument boolean function.
-pub fn count6<F: Fn(u64, u64, u64, u64, u64, u64) -> u64>(f: F) -> u32 {
+pub fn count6<F: FnMut(u64, u64, u64, u64, u64, u64) -> u64>(f: &mut F) -> u32 {
     (f)(P0, P1, P2, P3, P4, P5).count_ones()
 }
 /// Counts the number of solutions of a 7-argument boolean function.
-pub fn count7<F: Fn(u64, u64, u64, u64, u64, u64, u64) -> u64>(f: F) -> u32 {
+pub fn count7<F: FnMut(u64, u64, u64, u64, u64, u64, u64) -> u64>(f: &mut F) -> u32 {
     (f)(P0, P1, P2, P3, P4, P5, F).count_ones() +
     (f)(P0, P1, P2, P3, P4, P5, T).count_ones()
 }
 /// Counts the number of solutions of an 8-argument boolean function.
-pub fn count8<F: Fn(u64, u64, u64, u64, u64, u64, u64, u64) -> u64>(f: F) -> u32 {
+pub fn count8<F: FnMut(u64, u64, u64, u64, u64, u64, u64, u64) -> u64>(f: &mut F) -> u32 {
     (f)(P0, P1, P2, P3, P4, P5, F, F).count_ones() +
     (f)(P0, P1, P2, P3, P4, P5, F, T).count_ones() +
     (f)(P0, P1, P2, P3, P4, P5, T, F).count_ones() +
     (f)(P0, P1, P2, P3, P4, P5, T, T).count_ones()
 }
 /// Counts the number of solutions of a 9-argument boolean function.
-pub fn count9<F: Fn(u64, u64, u64, u64, u64, u64, u64, u64, u64) -> u64>(f: F) -> u32 {
+pub fn count9<F: FnMut(u64, u64, u64, u64, u64, u64, u64, u64, u64) -> u64>(f: &mut F) -> u32 {
     (f)(P0, P1, P2, P3, P4, P5, F, F, F).count_ones() +
     (f)(P0, P1, P2, P3, P4, P5, F, F, T).count_ones() +
     (f)(P0, P1, P2, P3, P4, P5, F, T, F).count_ones() +
@@ -117,7 +117,7 @@ pub fn count9<F: Fn(u64, u64, u64, u64, u64, u64, u64, u64, u64) -> u64>(f: F) -
     (f)(P0, P1, P2, P3, P4, P5, T, T, T).count_ones()
 }
 /// Counts the number of solutions of a 10-argument boolean function.
-pub fn count10<F: Fn(u64, u64, u64, u64, u64, u64, u64, u64, u64, u64) -> u64>(f: F) -> u32 {
+pub fn count10<F: FnMut(u64, u64, u64, u64, u64, u64, u64, u64, u64, u64) -> u64>(f: &mut F) -> u32 {
     (f)(P0, P1, P2, P3, P4, P5, F, F, F, F).count_ones() +
     (f)(P0, P1, P2, P3, P4, P5, F, F, F, T).count_ones() +
     (f)(P0, P1, P2, P3, P4, P5, F, F, T, F).count_ones() +
@@ -135,32 +135,89 @@ pub fn count10<F: Fn(u64, u64, u64, u64, u64, u64, u64, u64, u64, u64) -> u64>(f
     (f)(P0, P1, P2, P3, P4, P5, T, T, T, F).count_ones() +
     (f)(P0, P1, P2, P3, P4, P5, T, T, T, T).count_ones()
 }
+/// Counts the number of solutions of an n-argument boolean function.
+pub fn countn(n: usize, fun: &mut FnMut(&[u64]) -> u64) -> u64 {
+    match n {
+        0 => fun(&[]).count_ones() as u64,
+        1 => count1(&mut |a| fun(&[a])) as u64,
+        2 => count2(&mut |a, b| fun(&[a, b])) as u64,
+        3 => count3(&mut |a, b, c| fun(&[a, b, c])) as u64,
+        4 => count4(&mut |a, b, c, d| fun(&[a, b, c, d])) as u64,
+        5 => count5(&mut |a, b, c, d, e| fun(&[a, b, c, d, e])) as u64,
+        6 => count6(&mut |a, b, c, d, e, f| fun(&[a, b, c, d, e, f])) as u64,
+        7 => count7(&mut |a, b, c, d, e, f, g| fun(&[a, b, c, d, e, f, g])) as u64,
+        8 => count8(&mut |a, b, c, d, e, f, g, h| fun(&[a, b, c, d, e, f, g, h])) as u64,
+        9 => count9(&mut |a, b, c, d, e, f, g, h, i| fun(&[a, b, c, d, e, f, g, h, i])) as u64,
+        10 => count10(&mut |a, b, c, d, e, f, g, h, i, j| fun(&[a, b, c, d, e, f, g, h, i, j])) as u64,
+        _ => {
+            if n >= 19 {
+                let ref mut args = vec![0; n];
+                let mut sum = 0;
+                for i in 0..512 {
+                    args[0] = if (i & 0b1) == 0b1 {T} else {F};
+                    args[1] = if (i & 0b10) == 0b10 {T} else {F};
+                    args[2] = if (i & 0b100) == 0b100 {T} else {F};
+                    args[3] = if (i & 0b1000) == 0b1000 {T} else {F};
+                    args[4] = if (i & 0b10000) == 0b10000 {T} else {F};
+                    args[5] = if (i & 0b100000) == 0b100000 {T} else {F};
+                    args[6] = if (i & 0b1000000) == 0b1000000 {T} else {F};
+                    args[7] = if (i & 0b10000000) == 0b10000000 {T} else {F};
+                    args[8] = if (i & 0b100000000) == 0b100000000 {T} else {F};
+                    sum += countn(n-9, &mut |vs: &[u64]| {
+                        for i in 0..n-9 {args[i+1] = vs[i]}
+                        fun(&args)
+                    });
+                }
+                sum
+            } else {
+                let ref mut args = vec![0; n];
+                let mut sum = 0;
+                for i in 0..32 {
+                    args[0] = if (i & 0b1) == 0b1 {T} else {F};
+                    args[1] = if (i & 0b10) == 0b10 {T} else {F};
+                    args[2] = if (i & 0b100) == 0b100 {T} else {F};
+                    args[3] = if (i & 0b1000) == 0b1000 {T} else {F};
+                    args[4] = if (i & 0b10000) == 0b10000 {T} else {F};
+                    sum += countn(n-5, &mut |vs: &[u64]| {
+                        for i in 0..n-5 {args[i+1] = vs[i]}
+                        fun(&args)
+                    });
+                }
+                sum
+            }
+        }
+    }
+}
 
 /// Returns `true` if proposition is correct, `false` otherwise.
-pub fn prove1<F: Fn(u64) -> u64>(f: F) -> bool {count1(f) == 2}
+pub fn prove1<F: FnMut(u64) -> u64>(f: &mut F) -> bool {count1(f) == 2}
 /// Returns `true` if proposition is correct, `false` otherwise.
-pub fn prove2<F: Fn(u64, u64) -> u64>(f: F) -> bool {count2(f) == 4}
+pub fn prove2<F: FnMut(u64, u64) -> u64>(f: &mut F) -> bool {count2(f) == 4}
 /// Returns `true` if proposition is correct, `false` otherwise.
-pub fn prove3<F: Fn(u64, u64, u64) -> u64>(f: F) -> bool {count3(f) == 8}
+pub fn prove3<F: FnMut(u64, u64, u64) -> u64>(f: &mut F) -> bool {count3(f) == 8}
 /// Returns `true` if proposition is correct, `false` otherwise.
-pub fn prove4<F: Fn(u64, u64, u64, u64) -> u64>(f: F) -> bool {count4(f) == 16}
+pub fn prove4<F: FnMut(u64, u64, u64, u64) -> u64>(f: &mut F) -> bool {count4(f) == 16}
 /// Returns `true` if proposition is correct, `false` otherwise.
-pub fn prove5<F: Fn(u64, u64, u64, u64, u64) -> u64>(f: F) -> bool {count5(f) == 32}
+pub fn prove5<F: FnMut(u64, u64, u64, u64, u64) -> u64>(f: &mut F) -> bool {count5(f) == 32}
 /// Returns `true` if proposition is correct, `false` otherwise.
-pub fn prove6<F: Fn(u64, u64, u64, u64, u64, u64) -> u64>(f: F) -> bool {count6(f) == 64}
+pub fn prove6<F: FnMut(u64, u64, u64, u64, u64, u64) -> u64>(f: &mut F) -> bool {count6(f) == 64}
 /// Returns `true` if proposition is correct, `false` otherwise.
-pub fn prove7<F: Fn(u64, u64, u64, u64, u64, u64, u64) -> u64>(f: F) -> bool {count7(f) == 128}
+pub fn prove7<F: FnMut(u64, u64, u64, u64, u64, u64, u64) -> u64>(f: &mut F) -> bool {count7(f) == 128}
 /// Returns `true` if proposition is correct, `false` otherwise.
-pub fn prove8<F: Fn(u64, u64, u64, u64, u64, u64, u64, u64) -> u64>(f: F) -> bool {
+pub fn prove8<F: FnMut(u64, u64, u64, u64, u64, u64, u64, u64) -> u64>(f: &mut F) -> bool {
     count8(f) == 256
 }
 /// Returns `true` if proposition is correct, `false` otherwise.
-pub fn prove9<F: Fn(u64, u64, u64, u64, u64, u64, u64, u64, u64) -> u64>(f: F) -> bool {
+pub fn prove9<F: FnMut(u64, u64, u64, u64, u64, u64, u64, u64, u64) -> u64>(f: &mut F) -> bool {
     count9(f) == 512
 }
 /// Returns `true` if proposition is correct, `false` otherwise.
-pub fn prove10<F: Fn(u64, u64, u64, u64, u64, u64, u64, u64, u64, u64) -> u64>(f: F) -> bool {
+pub fn prove10<F: FnMut(u64, u64, u64, u64, u64, u64, u64, u64, u64, u64) -> u64>(f: &mut F) -> bool {
     count10(f) == 1024
+}
+/// Returns `true` if proposition is correct, `false` otherwise.
+pub fn proven<F: FnMut(&[u64]) -> u64>(n: usize, f: &mut F) -> bool {
+    countn(n, f) == 1 << n
 }
 
 /// Returns `T` if `a` is `true`, `F` otherwise.
@@ -260,6 +317,23 @@ pub fn and10(
 ) -> u64 {
     and(and5(a, b, c, d, e), and5(f, g, h, i, j))
 }
+/// An and relation of variable number of arguments.
+pub fn andn(vs: &[u64]) -> u64 {
+    match vs.len() {
+        0 => T,
+        1 => vs[0],
+        2 => and(vs[0], vs[1]),
+        3 => and3(vs[0], vs[1], vs[2]),
+        4 => and4(vs[0], vs[1], vs[2], vs[3]),
+        5 => and5(vs[0], vs[1], vs[2], vs[3], vs[4]),
+        6 => and6(vs[0], vs[1], vs[2], vs[3], vs[4], vs[5]),
+        7 => and7(vs[0], vs[1], vs[2], vs[3], vs[4], vs[5], vs[6]),
+        8 => and8(vs[0], vs[1], vs[2], vs[3], vs[4], vs[5], vs[6], vs[7]),
+        9 => and9(vs[0], vs[1], vs[2], vs[3], vs[4], vs[5], vs[6], vs[7], vs[8]),
+        10 => and10(vs[0], vs[1], vs[2], vs[3], vs[4], vs[5], vs[6], vs[7], vs[8], vs[9]),
+        x => and(andn(&vs[..x]), andn(&vs[x..]))
+    }
+}
 
 /// An or relation of 3 arguments.
 pub fn or3(a: u64, b: u64, c: u64) -> u64 {or(or(a, b), c)}
@@ -288,82 +362,71 @@ pub fn or10(
 ) -> u64 {
     or(or5(a, b, c, d, e), or5(f, g, h, i, j))
 }
+/// An or relation of variable number of arguments.
+pub fn orn(vs: &[u64]) -> u64 {
+    match vs.len() {
+        0 => F,
+        1 => vs[0],
+        2 => or(vs[0], vs[1]),
+        3 => or3(vs[0], vs[1], vs[2]),
+        4 => or4(vs[0], vs[1], vs[2], vs[3]),
+        5 => or5(vs[0], vs[1], vs[2], vs[3], vs[4]),
+        6 => or6(vs[0], vs[1], vs[2], vs[3], vs[4], vs[5]),
+        7 => or7(vs[0], vs[1], vs[2], vs[3], vs[4], vs[5], vs[6]),
+        8 => or8(vs[0], vs[1], vs[2], vs[3], vs[4], vs[5], vs[6], vs[7]),
+        9 => or9(vs[0], vs[1], vs[2], vs[3], vs[4], vs[5], vs[6], vs[7], vs[8]),
+        10 => or10(vs[0], vs[1], vs[2], vs[3], vs[4], vs[5], vs[6], vs[7], vs[8], vs[9]),
+        x => or(orn(&vs[..x]), orn(&vs[x..]))
+    }
+}
 
 /// An xor relation of 3 arguments.
 pub fn xor3(a: u64, b: u64, c: u64) -> u64 {
-    or3(
-        and3(a, not(b), not(c)),
-        and3(not(a), b, not(c)),
-        and3(not(a), not(b), c)
+    or(
+        and(xor(a, b), not(c)),
+        not(or3(a, b, not(c)))
     )
 }
 /// An xor relation of 4 arguments.
 pub fn xor4(a: u64, b: u64, c: u64, d: u64) -> u64 {
-    or4(
-        and4(a, not(b), not(c), not(d)),
-        and4(not(a), b, not(c), not(d)),
-        and4(not(a), not(b), c, not(d)),
-        and4(not(a), not(b), not(c), d)
+    or(
+        and(xor3(a, b, c), not(d)),
+        not(or4(a, b, c, not(d)))
     )
 }
 /// An xor relation of 5 arguments.
 pub fn xor5(a: u64, b: u64, c: u64, d: u64, e: u64) -> u64 {
-    or5(
-        and5(a, not(b), not(c), not(d), not(e)),
-        and5(not(a), b, not(c), not(d), not(e)),
-        and5(not(a), not(b), c, not(d), not(e)),
-        and5(not(a), not(b), not(c), d, not(e)),
-        and5(not(a), not(b), not(c), not(d), e)
+    or(
+        and(xor4(a, b, c, d), not(e)),
+        not(or5(a, b, c, d, not(e)))
     )
 }
 /// An xor relation of 6 arguments.
 pub fn xor6(a: u64, b: u64, c: u64, d: u64, e: u64, f: u64) -> u64 {
-    or6(
-        and6(a, not(b), not(c), not(d), not(e), not(f)),
-        and6(not(a), b, not(c), not(d), not(e), not(f)),
-        and6(not(a), not(b), c, not(d), not(e), not(f)),
-        and6(not(a), not(b), not(c), d, not(e), not(f)),
-        and6(not(a), not(b), not(c), not(d), e, not(f)),
-        and6(not(a), not(b), not(c), not(d), not(e), f)
+    or(
+        and(xor5(a, b, c, d, e), not(f)),
+        not(or6(a, b, c, d, e, not(f)))
     )
 }
 /// An xor relation of 7 arguments.
 pub fn xor7(a: u64, b: u64, c: u64, d: u64, e: u64, f: u64, g: u64) -> u64 {
-    or7(
-        and7(a, not(b), not(c), not(d), not(e), not(f), not(g)),
-        and7(not(a), b, not(c), not(d), not(e), not(f), not(g)),
-        and7(not(a), not(b), c, not(d), not(e), not(f), not(g)),
-        and7(not(a), not(b), not(c), d, not(e), not(f), not(g)),
-        and7(not(a), not(b), not(c), not(d), e, not(f), not(g)),
-        and7(not(a), not(b), not(c), not(d), not(e), f, not(g)),
-        and7(not(a), not(b), not(c), not(d), not(e), not(f), g)
+    or(
+        and(xor6(a, b, c, d, e, f), not(g)),
+        not(or7(a, b, c, d, e, f, not(g)))
     )
 }
 /// An xor relation of 8 arguments.
 pub fn xor8(a: u64, b: u64, c: u64, d: u64, e: u64, f: u64, g: u64, h: u64) -> u64 {
-    or8(
-        and8(a, not(b), not(c), not(d), not(e), not(f), not(g), not(h)),
-        and8(not(a), b, not(c), not(d), not(e), not(f), not(g), not(h)),
-        and8(not(a), not(b), c, not(d), not(e), not(f), not(g), not(h)),
-        and8(not(a), not(b), not(c), d, not(e), not(f), not(g), not(h)),
-        and8(not(a), not(b), not(c), not(d), e, not(f), not(g), not(h)),
-        and8(not(a), not(b), not(c), not(d), not(e), f, not(g), not(h)),
-        and8(not(a), not(b), not(c), not(d), not(e), not(f), g, not(h)),
-        and8(not(a), not(b), not(c), not(d), not(e), not(f), not(g), h)
+    or(
+        and(xor7(a, b, c, d, e, f, g), not(h)),
+        not(or8(a, b, c, d, e, f, g, not(h)))
     )
 }
 /// An xor relation of 9 arguments.
 pub fn xor9(a: u64, b: u64, c: u64, d: u64, e: u64, f: u64, g: u64, h: u64, i: u64) -> u64 {
-    or9(
-        and9(a, not(b), not(c), not(d), not(e), not(f), not(g), not(h), not(i)),
-        and9(not(a), b, not(c), not(d), not(e), not(f), not(g), not(h), not(i)),
-        and9(not(a), not(b), c, not(d), not(e), not(f), not(g), not(h), not(i)),
-        and9(not(a), not(b), not(c), d, not(e), not(f), not(g), not(h), not(i)),
-        and9(not(a), not(b), not(c), not(d), e, not(f), not(g), not(h), not(i)),
-        and9(not(a), not(b), not(c), not(d), not(e), f, not(g), not(h), not(i)),
-        and9(not(a), not(b), not(c), not(d), not(e), not(f), g, not(h), not(i)),
-        and9(not(a), not(b), not(c), not(d), not(e), not(f), not(g), h, not(i)),
-        and9(not(a), not(b), not(c), not(d), not(e), not(f), not(g), not(h), i)
+    or(
+        and(xor8(a, b, c, d, e, f, g, h), not(i)),
+        not(or9(a, b, c, d, e, f, g, h, not(i)))
     )
 }
 /// An xor relation of 10 arguments.
@@ -371,18 +434,32 @@ pub fn xor10(
     a: u64, b: u64, c: u64, d: u64, e: u64,
     f: u64, g: u64, h: u64, i: u64, j: u64
 ) -> u64 {
-    or10(
-        and10(a, not(b), not(c), not(d), not(e), not(f), not(g), not(h), not(i), not(j)),
-        and10(not(a), b, not(c), not(d), not(e), not(f), not(g), not(h), not(i), not(j)),
-        and10(not(a), not(b), c, not(d), not(e), not(f), not(g), not(h), not(i), not(j)),
-        and10(not(a), not(b), not(c), d, not(e), not(f), not(g), not(h), not(i), not(j)),
-        and10(not(a), not(b), not(c), not(d), e, not(f), not(g), not(h), not(i), not(j)),
-        and10(not(a), not(b), not(c), not(d), not(e), f, not(g), not(h), not(i), not(j)),
-        and10(not(a), not(b), not(c), not(d), not(e), not(f), g, not(h), not(i), not(j)),
-        and10(not(a), not(b), not(c), not(d), not(e), not(f), not(g), h, not(i), not(j)),
-        and10(not(a), not(b), not(c), not(d), not(e), not(f), not(g), not(h), i, not(j)),
-        and10(not(a), not(b), not(c), not(d), not(e), not(f), not(g), not(h), not(i), j),
+    or(
+        and(xor9(a, b, c, d, e, f, g, h, i), not(j)),
+        not(or10(a, b, c, d, e, f, g, h, i, not(j)))
     )
+}
+/// An xor relation of variable number of arguments.
+pub fn xorn(vs: &[u64]) -> u64 {
+    match vs.len() {
+        0 => F,
+        1 => vs[0],
+        2 => xor(vs[0], vs[1]),
+        3 => xor3(vs[0], vs[1], vs[2]),
+        4 => xor4(vs[0], vs[1], vs[2], vs[3]),
+        5 => xor5(vs[0], vs[1], vs[2], vs[3], vs[4]),
+        6 => xor6(vs[0], vs[1], vs[2], vs[3], vs[4], vs[5]),
+        7 => xor7(vs[0], vs[1], vs[2], vs[3], vs[4], vs[5], vs[6]),
+        8 => xor8(vs[0], vs[1], vs[2], vs[3], vs[4], vs[5], vs[6], vs[7]),
+        9 => xor9(vs[0], vs[1], vs[2], vs[3], vs[4], vs[5], vs[6], vs[7], vs[8]),
+        10 => xor10(vs[0], vs[1], vs[2], vs[3], vs[4], vs[5], vs[6], vs[7], vs[8], vs[9]),
+        x => {
+            or(
+                and(xorn(&vs[..x]), not(vs[x-1])),
+                not(or(orn(&vs[..x]), not(vs[x-1])))
+            )
+        }
+    }
 }
 
 /// An imply chain of 3 arguments.
@@ -419,6 +496,25 @@ pub fn imply10(
 ) -> u64 {
     and9(imply(a, b), imply(b, c), imply(c, d), imply(d, e),
          imply(e, f), imply(f, g), imply(g, h), imply(h, i), imply(i, j))
+}
+/// An imply chain of variable number of arguments.
+pub fn implyn(vs: &[u64]) -> u64 {
+    match vs.len() {
+        0 => T,
+        1 => vs[0],
+        2 => imply(vs[0], vs[1]),
+        3 => imply3(vs[0], vs[1], vs[2]),
+        4 => imply4(vs[0], vs[1], vs[2], vs[3]),
+        5 => imply5(vs[0], vs[1], vs[2], vs[3], vs[4]),
+        6 => imply6(vs[0], vs[1], vs[2], vs[3], vs[4], vs[5]),
+        7 => imply7(vs[0], vs[1], vs[2], vs[3], vs[4], vs[5], vs[6]),
+        8 => imply8(vs[0], vs[1], vs[2], vs[3], vs[4], vs[5], vs[6], vs[7]),
+        9 => imply9(vs[0], vs[1], vs[2], vs[3], vs[4], vs[5], vs[6], vs[7], vs[8]),
+        10 => imply10(vs[0], vs[1], vs[2], vs[3], vs[4], vs[5], vs[6], vs[7], vs[8], vs[9]),
+        x => {
+            and(implyn(&vs[..x]), imply(vs[x-2], vs[x-1]))
+        }
+    }
 }
 
 /// A boolean function of one argument.
@@ -478,27 +574,27 @@ mod tests {
 
     #[test]
     fn test_2() {
-        assert_eq!(count1(false_1), 0);
-        assert_eq!(count1(not), 1);
-        assert_eq!(count1(id), 1);
-        assert_eq!(count1(true_1), 2);
+        assert_eq!(count1(&mut false_1), 0);
+        assert_eq!(count1(&mut not), 1);
+        assert_eq!(count1(&mut id), 1);
+        assert_eq!(count1(&mut true_1), 2);
 
-        assert_eq!(count2(false_2), 0);
-        assert_eq!(count2(and), 1);
-        assert_eq!(count2(xor), 2);
-        assert_eq!(count2(eq), 2);
-        assert_eq!(count2(or), 3);
-        assert_eq!(count2(true_2), 4);
-        assert_eq!(count2(imply), 3);
-        assert_eq!(count2(|a, b| imply(and(a, b), or(a, b))), 4);
+        assert_eq!(count2(&mut false_2), 0);
+        assert_eq!(count2(&mut and), 1);
+        assert_eq!(count2(&mut xor), 2);
+        assert_eq!(count2(&mut eq), 2);
+        assert_eq!(count2(&mut or), 3);
+        assert_eq!(count2(&mut true_2), 4);
+        assert_eq!(count2(&mut imply), 3);
+        assert_eq!(count2(&mut |a, b| imply(and(a, b), or(a, b))), 4);
 
-        assert_eq!(count3(|a, b, c| and(or(a, b), and(a, c))), 2);
-        assert_eq!(count4(|a, b, c, d| and(or(a, b), or(c, d))), 9);
-        assert_eq!(count5(|_, _, _, _, _| T), 32);
-        assert_eq!(count6(|_, _, _, _, _, _| T), 64);
-        assert_eq!(count7(|_, _, _, _, _, _, _| T), 128);
-        assert_eq!(count8(|_, _, _, _, _, _, _, _| T), 256);
-        assert_eq!(count9(|_, _, _, _, _, _, _, _, _| T), 512);
-        assert_eq!(count10(|_, _, _, _, _, _, _, _, _, _| T), 1024);
+        assert_eq!(count3(&mut |a, b, c| and(or(a, b), and(a, c))), 2);
+        assert_eq!(count4(&mut |a, b, c, d| and(or(a, b), or(c, d))), 9);
+        assert_eq!(count5(&mut |_, _, _, _, _| T), 32);
+        assert_eq!(count6(&mut |_, _, _, _, _, _| T), 64);
+        assert_eq!(count7(&mut |_, _, _, _, _, _, _| T), 128);
+        assert_eq!(count8(&mut |_, _, _, _, _, _, _, _| T), 256);
+        assert_eq!(count9(&mut |_, _, _, _, _, _, _, _, _| T), 512);
+        assert_eq!(count10(&mut |_, _, _, _, _, _, _, _, _, _| T), 1024);
     }
 }

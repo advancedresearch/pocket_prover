@@ -5,19 +5,19 @@ use pocket_prover::*;
 fn main() {
     println!("If logic is false, then logic is true:");
     println!("(T -> F) -> (T -> T)");
-    println!("Result: {}", prove1(|_| {
+    println!("Result: {}", prove1(&mut |_| {
         imply(imply(T, F), imply(T, T))
     }));
     println!("");
     println!("However, the opposite is not true:");
     println!("(T -> T) -> (T -> F)");
-    println!("Result: {}", prove1(|_| {
+    println!("Result: {}", prove1(&mut |_| {
         imply(imply(T, T), imply(T, F))
     }));
     println!("");
     println!("Can prove that if logic is true, then is not true that logic is false:");
     println!("(T -> T) -> not(T -> F)");
-    println!("Result: {}", prove1(|_| {
+    println!("Result: {}", prove1(&mut |_| {
         imply(imply(T, T), not(imply(T, F)))
     }));
     println!("");
@@ -25,7 +25,7 @@ fn main() {
     println!("( (T -> F) -> (T -> T) ) & ( (T -> T) -> not(T -> F) )");
     println!("------------------------------------------------------");
     println!("T -> T");
-    println!("Result: {}", prove1(|_| {
+    println!("Result: {}", prove1(&mut |_| {
         imply(
             and(
                 imply(imply(T, F), imply(T, T)),
