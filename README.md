@@ -9,7 +9,7 @@ extern crate pocket_prover;
 use pocket_prover::*;
 
 fn main() {
-    println!("Socrates is mortal: {}", prove3(|man, mortal, socrates| {
+    println!("Socrates is mortal: {}", prove3(&mut |man, mortal, socrates| {
         // Using `imply` because we want to prove an inference rule.
         imply(
             // Premises.
