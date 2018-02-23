@@ -165,7 +165,7 @@ pub fn countn(n: usize, fun: &mut FnMut(&[u64]) -> u64) -> u64 {
                     args[7] = if (i & 0b10000000) == 0b10000000 {T} else {F};
                     args[8] = if (i & 0b100000000) == 0b100000000 {T} else {F};
                     sum += countn(n-9, &mut |vs: &[u64]| {
-                        for i in 0..n-9 {args[i+1] = vs[i]}
+                        for i in 0..n-9 {args[i+9] = vs[i]}
                         fun(&args)
                     });
                 }
@@ -180,7 +180,7 @@ pub fn countn(n: usize, fun: &mut FnMut(&[u64]) -> u64) -> u64 {
                     args[3] = if (i & 0b1000) == 0b1000 {T} else {F};
                     args[4] = if (i & 0b10000) == 0b10000 {T} else {F};
                     sum += countn(n-5, &mut |vs: &[u64]| {
-                        for i in 0..n-5 {args[i+1] = vs[i]}
+                        for i in 0..n-5 {args[i+5] = vs[i]}
                         fun(&args)
                     });
                 }
