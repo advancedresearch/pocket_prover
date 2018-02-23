@@ -569,6 +569,72 @@ pub fn all<E: Enumerable + Copy, F: Fn(E) -> u64>(f: &F) -> u64 {
     T
 }
 
+/// Implemented by provable systems of logic.
+///
+/// This trait is used by other crates in the PocketProver ecosystem named `pocket_prover-<name>`.
+///
+/// A common pattern is create logical systems that can be combined into new systems.
+/// For example, a base system `Foo` is extended by `Bar<Foo>`.
+/// However, `Bar<()>` might be used independently reasoning only about its own rules.
+///
+/// ```ignore
+/// pub struct Foo<T = ()> {
+///     pub bar: T,
+///     pub a: u64,
+///     pub b: u64,
+///     pub c: u64,
+/// }
+///
+/// impl ::std::ops::Deref for Foo<Bar> {
+///     type Target = Bar;
+///     fn deref(&self) -> &Bar {&self.bar}
+/// }
+///
+/// impl Prove for Foo { ... }
+/// impl Prove for Foo<Bar> { ... }
+/// ```
+///
+/// Pro tip: Add a `count` method first and then use it in `Prove::prove`.
+/// This is useful for debugging.
+pub trait Prove: Sized + Copy {
+    /// A method to prove a statement according to the rules.
+    fn prove<F: Fn(Self) -> u64>(f: F) -> bool;
+
+    /// According to the rules, the assumption does not lead to the conclusion,
+    /// but neither does it lead to the opposite conclusion.
+    fn does_not_mean<F: Fn(Self) -> u64, G: Fn(Self) -> u64>(
+        assumption: F, conclusion: G
+    ) -> bool {
+        !Self::prove(|x| imply(assumption(x), conclusion(x))) &&
+        !Self::prove(|x| imply(assumption(x), not(conclusion(x))))
+    }
+
+    /// According to the rules, the conclusion follows from the assumptions,
+    /// but the assumptions can not be used to get the opposite conclusion.
+    fn means<F: Fn(Self) -> u64, G: Fn(Self) -> u64>(assumption: F, conclusion: G) -> bool {
+        Self::prove(|x| imply(assumption(x), conclusion(x))) &&
+        !Self::prove(|x| imply(assumption(x), not(conclusion(x))))
+    }
+
+    /// Proves that according to the rules, two statements are equivalent.
+    fn eq<F: Fn(Self) -> u64, G: Fn(Self) -> u64>(a: F, b: G) -> bool {
+        Self::prove(|x| eq(a(x), b(x)))
+    }
+
+    /// Proves that according to the rules, two statements are exclusive.
+    fn exc<F: Fn(Self) -> u64, G: Fn(Self) -> u64>(a: F, b: G) -> bool {
+        Self::prove(|x| and(
+            imply(a(x), not(b(x))),
+            imply(b(x), not(a(x)))
+        ))
+    }
+
+    /// Proves that according to the rules, the first statement implies the other.
+    fn imply<F: Fn(Self) -> u64, G: Fn(Self) -> u64>(a: F, b: G) -> bool {
+        Self::prove(|x| imply(a(x), b(x)))
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
