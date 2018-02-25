@@ -1,0 +1,21 @@
+[package]
+name = "pocket_prover-derive"
+version = "0.1.0"
+authors = ["Sven Nilsen <bvssvni@gmail.com>"]
+keywords = ["prover", "solver", "logic", "first-order"]
+description = "Derive procedural macros for `pocket_prover`."
+license = "MIT"
+repository = "https://github.com/advancedresearch/pocket_prover.git"
+homepage = "https://github.com/advancedresearch/pocket_prover"
+documentation = "https://docs.rs/pocket_prover-derive"
+readme = "README.md"
+
+[lib]
+proc-macro = true
+
+[dependencies]
+syn = "0.11.11"
+quote = "0.3.15"
+
+[dev-dependencies]
+pocket_prover = {path = "../"}
