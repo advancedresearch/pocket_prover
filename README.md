@@ -44,6 +44,9 @@ This is useful in cases like:
 - Memorizing source code for situations like [The Martian](http://www.imdb.com/title/tt3659388/)
 - A tiny mistake and the whole planet blows up (e.g. final decisions before the AI singularity and you need to press the right buttons)
 
+In addition this library can be used to create extensible logical systems.
+For more information, see the `Prove` trait.
+
 ### Implementation
 
 This library uses brute-force to check proofs, instead of relying on axioms of logic.
@@ -56,3 +59,4 @@ This is done by replacing `bool` with `u64` and organizing inputs
 using bit patterns that simulate a truth table of 6 arguments.
 
 To extend to 10 arguments, `T` and `F` are used to alternate the 4 extra arguments.
+To extend to N arguments, recursive calls are used down to less than 10 arguments.

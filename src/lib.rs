@@ -46,6 +46,9 @@
 //! - Memorizing source code for situations like [The Martian](http://www.imdb.com/title/tt3659388/)
 //! - A tiny mistake and the whole planet blows up (e.g. final decisions before the AI singularity and you need to press the right buttons)
 //!
+//! In addition this library can be used to create extensible logical systems.
+//! For more information, see the `Prove` trait.
+//!
 //! ### Implementation
 //!
 //! This library uses brute-force to check proofs, instead of relying on axioms of logic.
@@ -58,7 +61,11 @@
 //! using bit patterns that simulate a truth table of 6 arguments.
 //!
 //! To extend to 10 arguments, `T` and `F` are used to alternate the 4 extra arguments.
+//! To extend to N arguments, recursive calls are used down to less than 10 arguments.
 
+/// The False proposition.
+/// Used to alternate higher than 6 arguments, set to `0`.
+pub const F: u64 = 0b00000000_00000000_00000000_00000000_00000000_00000000_00000000_00000000;
 /// 0xaaaa_aaaa_aaaa_aaaa
 pub const P0: u64 = 0b10101010_10101010_10101010_10101010_10101010_10101010_10101010_10101010;
 /// 0xcccc_cccc_cccc_cccc
@@ -71,9 +78,6 @@ pub const P3: u64 = 0b11111111_00000000_11111111_00000000_11111111_00000000_1111
 pub const P4: u64 = 0b11111111_11111111_00000000_00000000_11111111_11111111_00000000_00000000;
 /// 0xffff_ffff_0000_0000
 pub const P5: u64 = 0b11111111_11111111_11111111_11111111_00000000_00000000_00000000_00000000;
-/// The False proposition.
-/// Used to alternate higher than 6 arguments, set to `0`.
-pub const F: u64 = 0b00000000_00000000_00000000_00000000_00000000_00000000_00000000_00000000;
 /// The True proposition.
 /// Used to alternate higher than 6 arguments, set to `1`.
 pub const T: u64 = 0b11111111_11111111_11111111_11111111_11111111_11111111_11111111_11111111;
@@ -594,9 +598,10 @@ pub fn all<E: Enumerable + Copy, F: Fn(E) -> u64>(f: &F) -> u64 {
 /// impl Prove for Foo<Bar> { ... }
 /// ```
 ///
-/// Pro tip: Add a `count` method first and then use it in `Prove::prove`.
-/// This is useful for debugging.
+/// Pro tip: Use the `Construct` and `ExtendRules` trait to auto impl this trait.
 pub trait Prove: Sized + Copy {
+    /// A method to count true statements.
+    fn count<F: Fn(Self) -> u64>(f: F) -> u64;
     /// A method to prove a statement according to the rules.
     fn prove<F: Fn(Self) -> u64>(f: F) -> bool;
 
@@ -632,6 +637,500 @@ pub trait Prove: Sized + Copy {
     /// Proves that according to the rules, the first statement implies the other.
     fn imply<F: Fn(Self) -> u64, G: Fn(Self) -> u64>(a: F, b: G) -> bool {
         Self::prove(|x| imply(a(x), b(x)))
+    }
+}
+
+/// Implemented by logical systems to define core rules.
+pub trait CoreRules {
+    /// The core rules of the logical system.
+    fn core_rules(&self) -> u64;
+}
+
+/// Implemented by logical systems to extend existing ones.
+pub trait ExtendRules: CoreRules {
+    /// The inner logical system.
+    type Inner: ExtendRules;
+    /// Gets the inner logical system.
+    fn inner(&self) -> &Self::Inner;
+    /// Rules used to integrate with inner logical system.
+    fn extend_rules(&self, inner: &Self::Inner) -> u64;
+
+    /// The full rules of the entire logical system.
+    fn full_rules(&self) -> u64 {
+        and3(self.core_rules(), self.extend_rules(self.inner()), self.inner().full_rules())
+    }
+}
+
+impl CoreRules for () {
+    fn core_rules(&self) -> u64 {T}
+}
+
+impl<T0: CoreRules, T1: CoreRules> CoreRules for (T0, T1) {
+    fn core_rules(&self) -> u64 {
+        and(self.0.core_rules(), self.1.core_rules())
+    }
+}
+
+impl<T0, T1, T2> CoreRules for (T0, T1, T2)
+    where T0: CoreRules, T1: CoreRules, T2: CoreRules
+{
+    fn core_rules(&self) -> u64 {
+        and3(
+            self.0.core_rules(),
+            self.1.core_rules(),
+            self.2.core_rules(),
+        )
+    }
+}
+
+impl<T0, T1, T2, T3> CoreRules for (T0, T1, T2, T3)
+    where T0: CoreRules, T1: CoreRules,
+          T2: CoreRules, T3: CoreRules,
+{
+    fn core_rules(&self) -> u64 {
+        and4(
+            self.0.core_rules(),
+            self.1.core_rules(),
+            self.2.core_rules(),
+            self.3.core_rules(),
+        )
+    }
+}
+
+impl<T0, T1, T2, T3, T4> CoreRules for (T0, T1, T2, T3, T4)
+    where T0: CoreRules, T1: CoreRules,
+          T2: CoreRules, T3: CoreRules,
+          T4: CoreRules,
+{
+    fn core_rules(&self) -> u64 {
+        and5(
+            self.0.core_rules(),
+            self.1.core_rules(),
+            self.2.core_rules(),
+            self.3.core_rules(),
+            self.4.core_rules(),
+        )
+    }
+}
+
+impl<T0, T1, T2, T3, T4, T5> CoreRules for (T0, T1, T2, T3, T4, T5)
+    where T0: CoreRules, T1: CoreRules,
+          T2: CoreRules, T3: CoreRules,
+          T4: CoreRules, T5: CoreRules,
+{
+    fn core_rules(&self) -> u64 {
+        and6(
+            self.0.core_rules(),
+            self.1.core_rules(),
+            self.2.core_rules(),
+            self.3.core_rules(),
+            self.4.core_rules(),
+            self.5.core_rules(),
+        )
+    }
+}
+
+impl<T0, T1, T2, T3, T4, T5, T6> CoreRules for (T0, T1, T2, T3, T4, T5, T6)
+    where T0: CoreRules, T1: CoreRules,
+          T2: CoreRules, T3: CoreRules,
+          T4: CoreRules, T5: CoreRules,
+          T6: CoreRules,
+{
+    fn core_rules(&self) -> u64 {
+        and7(
+            self.0.core_rules(),
+            self.1.core_rules(),
+            self.2.core_rules(),
+            self.3.core_rules(),
+            self.4.core_rules(),
+            self.5.core_rules(),
+            self.6.core_rules(),
+        )
+    }
+}
+
+impl<T0, T1, T2, T3, T4, T5, T6, T7> CoreRules for (T0, T1, T2, T3, T4, T5, T6, T7)
+    where T0: CoreRules, T1: CoreRules,
+          T2: CoreRules, T3: CoreRules,
+          T4: CoreRules, T5: CoreRules,
+          T6: CoreRules, T7: CoreRules,
+{
+    fn core_rules(&self) -> u64 {
+        and8(
+            self.0.core_rules(),
+            self.1.core_rules(),
+            self.2.core_rules(),
+            self.3.core_rules(),
+            self.4.core_rules(),
+            self.5.core_rules(),
+            self.6.core_rules(),
+            self.7.core_rules(),
+        )
+    }
+}
+
+impl<T0, T1, T2, T3, T4, T5, T6, T7, T8> CoreRules for (T0, T1, T2, T3, T4, T5, T6, T7, T8)
+    where T0: CoreRules, T1: CoreRules,
+          T2: CoreRules, T3: CoreRules,
+          T4: CoreRules, T5: CoreRules,
+          T6: CoreRules, T7: CoreRules,
+          T8: CoreRules,
+{
+    fn core_rules(&self) -> u64 {
+        and9(
+            self.0.core_rules(),
+            self.1.core_rules(),
+            self.2.core_rules(),
+            self.3.core_rules(),
+            self.4.core_rules(),
+            self.5.core_rules(),
+            self.6.core_rules(),
+            self.7.core_rules(),
+            self.8.core_rules(),
+        )
+    }
+}
+
+impl<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9> CoreRules for (T0, T1, T2, T3, T4, T5, T6, T7, T8, T9)
+    where T0: CoreRules, T1: CoreRules,
+          T2: CoreRules, T3: CoreRules,
+          T4: CoreRules, T5: CoreRules,
+          T6: CoreRules, T7: CoreRules,
+          T8: CoreRules, T9: CoreRules,
+{
+    fn core_rules(&self) -> u64 {
+        and10(
+            self.0.core_rules(),
+            self.1.core_rules(),
+            self.2.core_rules(),
+            self.3.core_rules(),
+            self.4.core_rules(),
+            self.5.core_rules(),
+            self.6.core_rules(),
+            self.7.core_rules(),
+            self.8.core_rules(),
+            self.9.core_rules(),
+        )
+    }
+}
+
+impl ExtendRules for () {
+    type Inner = ();
+    fn inner(&self) -> &() {&()}
+    fn extend_rules(&self, _: &()) -> u64 {T}
+    fn full_rules(&self) -> u64 {T}
+}
+
+impl<T0: ExtendRules, T1: ExtendRules> ExtendRules for (T0, T1) {
+    type Inner = ();
+    fn inner(&self) -> &() {&()}
+    fn extend_rules(&self, _: &()) -> u64 {T}
+}
+
+impl<T0, T1, T2> ExtendRules for (T0, T1, T2)
+    where T0: ExtendRules, T1: ExtendRules, T2: ExtendRules
+{
+    type Inner = ();
+    fn inner(&self) -> &() {&()}
+    fn extend_rules(&self, _: &()) -> u64 {T}
+}
+
+impl<T0, T1, T2, T3> ExtendRules for (T0, T1, T2, T3)
+    where T0: ExtendRules, T1: ExtendRules,
+          T2: ExtendRules, T3: ExtendRules
+{
+    type Inner = ();
+    fn inner(&self) -> &() {&()}
+    fn extend_rules(&self, _: &()) -> u64 {T}
+}
+
+impl<T0, T1, T2, T3, T4> ExtendRules for (T0, T1, T2, T3, T4)
+    where T0: ExtendRules, T1: ExtendRules,
+          T2: ExtendRules, T3: ExtendRules,
+          T4: ExtendRules,
+{
+    type Inner = ();
+    fn inner(&self) -> &() {&()}
+    fn extend_rules(&self, _: &()) -> u64 {T}
+}
+
+impl<T0, T1, T2, T3, T4, T5> ExtendRules for (T0, T1, T2, T3, T4, T5)
+    where T0: ExtendRules, T1: ExtendRules,
+          T2: ExtendRules, T3: ExtendRules,
+          T4: ExtendRules, T5: ExtendRules,
+{
+    type Inner = ();
+    fn inner(&self) -> &() {&()}
+    fn extend_rules(&self, _: &()) -> u64 {T}
+}
+
+impl<T0, T1, T2, T3, T4, T5, T6> ExtendRules for (T0, T1, T2, T3, T4, T5, T6)
+    where T0: ExtendRules, T1: ExtendRules,
+          T2: ExtendRules, T3: ExtendRules,
+          T4: ExtendRules, T5: ExtendRules,
+          T6: ExtendRules,
+{
+    type Inner = ();
+    fn inner(&self) -> &() {&()}
+    fn extend_rules(&self, _: &()) -> u64 {T}
+}
+
+impl<T0, T1, T2, T3, T4, T5, T6, T7> ExtendRules for (T0, T1, T2, T3, T4, T5, T6, T7)
+    where T0: ExtendRules, T1: ExtendRules,
+          T2: ExtendRules, T3: ExtendRules,
+          T4: ExtendRules, T5: ExtendRules,
+          T6: ExtendRules, T7: ExtendRules,
+{
+    type Inner = ();
+    fn inner(&self) -> &() {&()}
+    fn extend_rules(&self, _: &()) -> u64 {T}
+}
+
+impl<T0, T1, T2, T3, T4, T5, T6, T7, T8> ExtendRules for (T0, T1, T2, T3, T4, T5, T6, T7, T8)
+    where T0: ExtendRules, T1: ExtendRules,
+          T2: ExtendRules, T3: ExtendRules,
+          T4: ExtendRules, T5: ExtendRules,
+          T6: ExtendRules, T7: ExtendRules,
+          T8: ExtendRules,
+{
+    type Inner = ();
+    fn inner(&self) -> &() {&()}
+    fn extend_rules(&self, _: &()) -> u64 {T}
+}
+
+impl<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9> ExtendRules
+for (T0, T1, T2, T3, T4, T5, T6, T7, T8, T9)
+    where T0: ExtendRules, T1: ExtendRules,
+          T2: ExtendRules, T3: ExtendRules,
+          T4: ExtendRules, T5: ExtendRules,
+          T6: ExtendRules, T7: ExtendRules,
+          T8: ExtendRules, T9: ExtendRules,
+{
+    type Inner = ();
+    fn inner(&self) -> &() {&()}
+    fn extend_rules(&self, _: &()) -> u64 {T}
+}
+
+
+/// Used to construct logical systems.
+pub trait Construct: Sized {
+    /// Creates a logical system out of proof arguments.
+    fn construct(vs: &[u64]) -> Self;
+
+    /// Gets the number of bits in logical system.
+    fn n() -> usize {
+        use std::mem::size_of;
+        size_of::<Self>() / size_of::<u64>()
+    }
+}
+
+impl Construct for () {
+    fn construct(_vs: &[u64]) -> Self {()}
+}
+
+impl<T0: Construct, T1: Construct> Construct for (T0, T1) {
+    fn construct(vs: &[u64]) -> Self {
+        let n = <T0 as Construct>::n();
+        (Construct::construct(vs), Construct::construct(&vs[n..]))
+    }
+}
+
+impl<T0, T1, T2> Construct for (T0, T1, T2)
+    where T0: Construct, T1: Construct, T2: Construct
+{
+    fn construct(vs: &[u64]) -> Self {
+        let n0 = <T0 as Construct>::n();
+        let n1 = <T1 as Construct>::n() + n0;
+        (
+            Construct::construct(vs),
+            Construct::construct(&vs[n0..]),
+            Construct::construct(&vs[n1..])
+        )
+    }
+}
+
+impl<T0, T1, T2, T3> Construct for (T0, T1, T2, T3)
+    where T0: Construct, T1: Construct, T2: Construct, T3: Construct
+{
+    fn construct(vs: &[u64]) -> Self {
+        let n0 = <T0 as Construct>::n();
+        let n1 = <T1 as Construct>::n() + n0;
+        let n2 = <T2 as Construct>::n() + n1;
+        (
+            Construct::construct(vs),
+            Construct::construct(&vs[n0..]),
+            Construct::construct(&vs[n1..]),
+            Construct::construct(&vs[n2..])
+        )
+    }
+}
+
+impl<T0, T1, T2, T3, T4> Construct for (T0, T1, T2, T3, T4)
+    where T0: Construct, T1: Construct,
+          T2: Construct, T3: Construct,
+          T4: Construct
+{
+    fn construct(vs: &[u64]) -> Self {
+        let n0 = <T0 as Construct>::n();
+        let n1 = <T1 as Construct>::n() + n0;
+        let n2 = <T2 as Construct>::n() + n1;
+        let n3 = <T3 as Construct>::n() + n2;
+        (
+            Construct::construct(vs),
+            Construct::construct(&vs[n0..]),
+            Construct::construct(&vs[n1..]),
+            Construct::construct(&vs[n2..]),
+            Construct::construct(&vs[n3..])
+        )
+    }
+}
+
+impl<T0, T1, T2, T3, T4, T5> Construct for (T0, T1, T2, T3, T4, T5)
+    where T0: Construct, T1: Construct,
+          T2: Construct, T3: Construct,
+          T4: Construct, T5: Construct,
+{
+    fn construct(vs: &[u64]) -> Self {
+        let n0 = <T0 as Construct>::n();
+        let n1 = <T1 as Construct>::n() + n0;
+        let n2 = <T2 as Construct>::n() + n1;
+        let n3 = <T3 as Construct>::n() + n2;
+        let n4 = <T4 as Construct>::n() + n3;
+        (
+            Construct::construct(vs),
+            Construct::construct(&vs[n0..]),
+            Construct::construct(&vs[n1..]),
+            Construct::construct(&vs[n2..]),
+            Construct::construct(&vs[n3..]),
+            Construct::construct(&vs[n4..])
+        )
+    }
+}
+
+impl<T0, T1, T2, T3, T4, T5, T6> Construct for (T0, T1, T2, T3, T4, T5, T6)
+    where T0: Construct, T1: Construct,
+          T2: Construct, T3: Construct,
+          T4: Construct, T5: Construct,
+          T6: Construct
+{
+    fn construct(vs: &[u64]) -> Self {
+        let n0 = <T0 as Construct>::n();
+        let n1 = <T1 as Construct>::n() + n0;
+        let n2 = <T2 as Construct>::n() + n1;
+        let n3 = <T3 as Construct>::n() + n2;
+        let n4 = <T4 as Construct>::n() + n3;
+        let n5 = <T5 as Construct>::n() + n4;
+        (
+            Construct::construct(vs),
+            Construct::construct(&vs[n0..]),
+            Construct::construct(&vs[n1..]),
+            Construct::construct(&vs[n2..]),
+            Construct::construct(&vs[n3..]),
+            Construct::construct(&vs[n4..]),
+            Construct::construct(&vs[n5..])
+        )
+    }
+}
+
+impl<T0, T1, T2, T3, T4, T5, T6, T7> Construct for (T0, T1, T2, T3, T4, T5, T6, T7)
+    where T0: Construct, T1: Construct,
+          T2: Construct, T3: Construct,
+          T4: Construct, T5: Construct,
+          T6: Construct, T7: Construct
+{
+    fn construct(vs: &[u64]) -> Self {
+        let n0 = <T0 as Construct>::n();
+        let n1 = <T1 as Construct>::n() + n0;
+        let n2 = <T2 as Construct>::n() + n1;
+        let n3 = <T3 as Construct>::n() + n2;
+        let n4 = <T4 as Construct>::n() + n3;
+        let n5 = <T5 as Construct>::n() + n4;
+        let n6 = <T6 as Construct>::n() + n5;
+        (
+            Construct::construct(vs),
+            Construct::construct(&vs[n0..]),
+            Construct::construct(&vs[n1..]),
+            Construct::construct(&vs[n2..]),
+            Construct::construct(&vs[n3..]),
+            Construct::construct(&vs[n4..]),
+            Construct::construct(&vs[n5..]),
+            Construct::construct(&vs[n6..])
+        )
+    }
+}
+
+impl<T0, T1, T2, T3, T4, T5, T6, T7, T8> Construct for (T0, T1, T2, T3, T4, T5, T6, T7, T8)
+    where T0: Construct, T1: Construct,
+          T2: Construct, T3: Construct,
+          T4: Construct, T5: Construct,
+          T6: Construct, T7: Construct,
+          T8: Construct
+{
+    fn construct(vs: &[u64]) -> Self {
+        let n0 = <T0 as Construct>::n();
+        let n1 = <T1 as Construct>::n() + n0;
+        let n2 = <T2 as Construct>::n() + n1;
+        let n3 = <T3 as Construct>::n() + n2;
+        let n4 = <T4 as Construct>::n() + n3;
+        let n5 = <T5 as Construct>::n() + n4;
+        let n6 = <T6 as Construct>::n() + n5;
+        let n7 = <T7 as Construct>::n() + n6;
+        (
+            Construct::construct(vs),
+            Construct::construct(&vs[n0..]),
+            Construct::construct(&vs[n1..]),
+            Construct::construct(&vs[n2..]),
+            Construct::construct(&vs[n3..]),
+            Construct::construct(&vs[n4..]),
+            Construct::construct(&vs[n5..]),
+            Construct::construct(&vs[n6..]),
+            Construct::construct(&vs[n7..])
+        )
+    }
+}
+
+impl<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9> Construct for (T0, T1, T2, T3, T4, T5, T6, T7, T8, T9)
+    where T0: Construct, T1: Construct,
+          T2: Construct, T3: Construct,
+          T4: Construct, T5: Construct,
+          T6: Construct, T7: Construct,
+          T8: Construct, T9: Construct
+{
+    fn construct(vs: &[u64]) -> Self {
+        let n0 = <T0 as Construct>::n();
+        let n1 = <T1 as Construct>::n() + n0;
+        let n2 = <T2 as Construct>::n() + n1;
+        let n3 = <T3 as Construct>::n() + n2;
+        let n4 = <T4 as Construct>::n() + n3;
+        let n5 = <T5 as Construct>::n() + n4;
+        let n6 = <T6 as Construct>::n() + n5;
+        let n7 = <T7 as Construct>::n() + n6;
+        let n8 = <T8 as Construct>::n() + n7;
+        (
+            Construct::construct(vs),
+            Construct::construct(&vs[n0..]),
+            Construct::construct(&vs[n1..]),
+            Construct::construct(&vs[n2..]),
+            Construct::construct(&vs[n3..]),
+            Construct::construct(&vs[n4..]),
+            Construct::construct(&vs[n5..]),
+            Construct::construct(&vs[n6..]),
+            Construct::construct(&vs[n7..]),
+            Construct::construct(&vs[n8..])
+        )
+    }
+}
+
+impl<T> Prove for T where T: Copy + Construct + ExtendRules {
+    fn count<F: Fn(Self) -> u64>(f: F) -> u64 {
+        countn(<Self as Construct>::n(), &mut |vs| {
+            let v: Self = Construct::construct(vs);
+            imply(v.full_rules(), f(v))
+        })
+    }
+
+    fn prove<F: Fn(Self) -> u64>(f: F) -> bool {
+        Self::count(f) == 1 << <Self as Construct>::n()
     }
 }
 
