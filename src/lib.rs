@@ -336,7 +336,7 @@ pub fn andn(vs: &[u64]) -> u64 {
         8 => and8(vs[0], vs[1], vs[2], vs[3], vs[4], vs[5], vs[6], vs[7]),
         9 => and9(vs[0], vs[1], vs[2], vs[3], vs[4], vs[5], vs[6], vs[7], vs[8]),
         10 => and10(vs[0], vs[1], vs[2], vs[3], vs[4], vs[5], vs[6], vs[7], vs[8], vs[9]),
-        x => and(andn(&vs[..x]), andn(&vs[x..]))
+        _ => and(andn(&vs[..10]), andn(&vs[10..]))
     }
 }
 
@@ -381,7 +381,7 @@ pub fn orn(vs: &[u64]) -> u64 {
         8 => or8(vs[0], vs[1], vs[2], vs[3], vs[4], vs[5], vs[6], vs[7]),
         9 => or9(vs[0], vs[1], vs[2], vs[3], vs[4], vs[5], vs[6], vs[7], vs[8]),
         10 => or10(vs[0], vs[1], vs[2], vs[3], vs[4], vs[5], vs[6], vs[7], vs[8], vs[9]),
-        x => or(orn(&vs[..x]), orn(&vs[x..]))
+        _ => or(orn(&vs[..10]), orn(&vs[10..]))
     }
 }
 
