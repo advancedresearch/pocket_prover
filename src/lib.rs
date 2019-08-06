@@ -599,11 +599,20 @@ pub fn all<E: Enumerable + Copy, F: Fn(E) -> u64>(f: &F) -> u64 {
 /// ```
 ///
 /// Pro tip: Use the `Construct` and `ExtendRules` trait to auto impl this trait.
+/// For base logical systems, implement the `BaseSystem` trait to auto impl this trait.
 pub trait Prove: Sized + Copy {
     /// A method to count true statements.
+    ///
+    /// Counts `imply(<system>, f)` since this permits deriving all other methods automatically.
     fn count<F: Fn(Self) -> u64>(f: F) -> u64;
+
     /// A method to prove a statement according to the rules.
-    fn prove<F: Fn(Self) -> u64>(f: F) -> bool;
+    ///
+    /// The default method counts true cases and might be overridden for better performance.
+    /// One can compute the number of true cases faster by using `1 << bits`.
+    fn prove<F: Fn(Self) -> u64>(f: F) -> bool {
+        Self::count(f) == Self::count(|_| T)
+    }
 
     /// According to the rules, the assumption does not lead to the conclusion,
     /// but neither does it lead to the opposite conclusion.
@@ -638,6 +647,42 @@ pub trait Prove: Sized + Copy {
     fn imply<F: Fn(Self) -> u64, G: Fn(Self) -> u64>(a: F, b: G) -> bool {
         Self::prove(|x| imply(a(x), b(x)))
     }
+
+    /// Computes the logical probability `P(f | rules)`.
+    fn prob<F: Fn(Self) -> u64>(f: F) -> Option<f64> {
+        // Get the number of cases when the system implies falsehood.
+        // This is an indirect way of counting cases when the rules are true.
+        let fa = Self::count(|_| F);
+        let tr = Self::count(|_| T);
+        let full_rules = tr - fa;
+        if full_rules == 0 {return None}
+        else {
+            Some((Self::count(f) - fa) as f64 / full_rules as f64)
+        }
+    }
+
+    /// Computes the logical probability `P(b | a ∧ rules)`.
+    fn prob_imply<A: Fn(Self) -> u64 + Copy, B: Fn(Self) -> u64>(a: A, b: B) -> Option<f64> {
+        let fa = Self::count(|_| F);
+        let count_a = Self::count(a) - fa;
+        if count_a == 0 {return None}
+        else {
+            Some((Self::count(|x| and(a(x), b(x))) - fa) as f64 / count_a as f64)
+        }
+    }
+}
+
+impl<T> Prove for T where T: Copy + Construct + ExtendRules {
+    fn count<F: Fn(Self) -> u64>(f: F) -> u64 {
+        countn(<Self as Construct>::n(), &mut |vs| {
+            let v: Self = Construct::construct(vs);
+            imply(v.full_rules(), f(v))
+        })
+    }
+
+    fn prove<F: Fn(Self) -> u64>(f: F) -> bool {
+        Self::count(f) == 1 << <Self as Construct>::n()
+    }
 }
 
 /// Implemented by logical systems to define core rules.
@@ -659,6 +704,17 @@ pub trait ExtendRules: CoreRules {
     fn full_rules(&self) -> u64 {
         and3(self.core_rules(), self.extend_rules(self.inner()), self.inner().full_rules())
     }
+}
+
+/// Implemented by base logical systems.
+///
+/// Auto impls the `ExtendRules` trait and therefore also the `Prove` trait.
+pub trait BaseSystem: Construct + CoreRules {}
+
+impl<T> ExtendRules for T where T: BaseSystem {
+    type Inner = ();
+    fn inner(&self) -> &() {&()}
+    fn extend_rules(&self, _: &Self::Inner) -> u64 {T}
 }
 
 impl CoreRules for () {
@@ -1118,19 +1174,6 @@ impl<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9> Construct for (T0, T1, T2, T3, T4, 
             Construct::construct(&vs[n7..]),
             Construct::construct(&vs[n8..])
         )
-    }
-}
-
-impl<T> Prove for T where T: Copy + Construct + ExtendRules {
-    fn count<F: Fn(Self) -> u64>(f: F) -> u64 {
-        countn(<Self as Construct>::n(), &mut |vs| {
-            let v: Self = Construct::construct(vs);
-            imply(v.full_rules(), f(v))
-        })
-    }
-
-    fn prove<F: Fn(Self) -> u64>(f: F) -> bool {
-        Self::count(f) == 1 << <Self as Construct>::n()
     }
 }
 

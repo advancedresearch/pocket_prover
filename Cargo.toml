@@ -1,6 +1,6 @@
 [package]
 name = "pocket_prover"
-version = "0.5.1"
+version = "0.6.0"
 authors = ["Sven Nilsen <bvssvni@gmail.com>"]
 keywords = ["prover", "solver", "logic", "first-order"]
 description = "A fast, brute force, automatic theorem prover for first order logic"
