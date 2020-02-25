@@ -9,7 +9,7 @@ fn main() {
     // This is needed to check proofs for different kinds of predicates.
     // For our purposes, we only need `T`, `F` and something in between.
     // This works because the proofs only use a single predicate and no
-    // combinations of predicates, and the predicates does not depend
+    // combinations of predicates, and the predicates do not depend
     // on any variable besides the argument.
     let ps: Vec<fn(u8) -> u64> = vec![
         |_: u8| T,
