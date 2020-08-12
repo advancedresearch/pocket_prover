@@ -7,6 +7,7 @@ fn main() {
     println!("");
     println!("This example demonstrates a proof technique to reduce");
     println!("quantifiers in first-order logic to propositional logic.");
+    println!("Paper: https://github.com/advancedresearch/path_semantics/blob/master/papers-wip/single-variable-first-order-proof-transform-into-propositional-logic.pdf");
     println!("");
     println!("C(x) = x in this class");
     println!("B(x) = x has read the book");
