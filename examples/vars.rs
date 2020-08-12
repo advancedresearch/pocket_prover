@@ -1,5 +1,3 @@
-#![feature(slice_patterns)]
-
 extern crate pocket_prover;
 
 use pocket_prover::*;
