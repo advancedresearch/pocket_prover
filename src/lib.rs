@@ -141,7 +141,7 @@ pub fn count10<F: FnMut(u64, u64, u64, u64, u64, u64, u64, u64, u64, u64) -> u64
     (f)(P0, P1, P2, P3, P4, P5, T, T, T, T).count_ones()
 }
 /// Counts the number of solutions of an n-argument boolean function.
-pub fn countn(n: usize, fun: &mut FnMut(&[u64]) -> u64) -> u64 {
+pub fn countn(n: usize, fun: &mut dyn FnMut(&[u64]) -> u64) -> u64 {
     match n {
         0 => fun(&[]).count_ones() as u64,
         1 => count1(&mut |a| fun(&[a])) as u64,
