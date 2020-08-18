@@ -62,6 +62,68 @@
 //!
 //! To extend to 10 arguments, `T` and `F` are used to alternate the 4 extra arguments.
 //! To extend to N arguments, recursive calls are used down to less than 10 arguments.
+//!
+//! ### Path Semantical Logic
+//!
+//! *Notice! Path Semantical Logic is at early stage of research.*
+//!
+//! This library has experimental support for a subset of Path Semantical Logic.
+//! Implementation is based on paper [Faster Brute Force Proofs](https://github.com/advancedresearch/path_semantics/blob/master/papers-wip/faster-brute-force-proofs.pdf).
+//!
+//! Path Semantical Logic separates propositions into levels,
+//! such that an equality between two propositions in level N+1,
+//! propagates into equality between uniquely associated propositions in level N.
+//!
+//! For example, if `f` has level 1 and `x` has level 0,
+//! then `imply(f, x)` associates `x` uniquely with `f`,
+//! such that the core axiom of [Path Semantics](https://github.com/advancedresearch/path_semantics)
+//! is satisfied.
+//!
+//! This library has currently only support for level 1 and 0.
+//! These functions are prefixed with `path1_`.
+//! Each function takes two arguments, consisting of tuples of propositions, e.g. `(f, g), (x, y)`.
+//!
+//! - The first tuple has level 1 (ceil(n/2) propositions)
+//! - The second tuple has level 0 (floor(n/2) propositions)
+//!
+//! ```rust
+//! extern crate pocket_prover;
+//!
+//! use pocket_prover::*;
+//!
+//! fn main() {
+//!     println!("=== Path Semantical Logic ===");
+//!     println!("The notation `f(x)` means `x` is uniquely associated with `f`.");
+//!     println!("For more information, see the section 'Path Semantical Logic' in documentation.");
+//!     println!("");
+//!
+//!     print!("(f(x), g(y), h(z), f=g ⊻ f=h) => (x=y ∨ x=z): ");
+//!     println!("{}\n", path1_prove6(&mut |(f, g, h), (x, y, z)| {
+//!         imply(
+//!             and4(
+//!                 imply(f, x),
+//!                 imply(g, y),
+//!                 imply(h, z),
+//!                 xor(eq(f, g), eq(f, h))
+//!             ),
+//!             or(eq(x, y), eq(x, z))
+//!         )
+//!     }));
+//!
+//!     print!("(f(x), g(y), f=g => h, h(z)) => (x=y => z): ");
+//!     println!("{}\n", path1_prove6(&mut |(f, g, h), (x, y, z)| {
+//!         imply(
+//!             and4(
+//!                 imply(f, x),
+//!                 imply(g, y),
+//!                 imply(eq(f, g), h),
+//!                 imply(h, z)
+//!             ),
+//!             imply(eq(x, y), z)
+//!         )
+//!     }));
+//! }
+//! ```
 
 /// The False proposition.
 /// Used to alternate higher than 6 arguments, set to `0`.
@@ -194,6 +256,196 @@ pub fn countn(n: usize, fun: &mut dyn FnMut(&[u64]) -> u64) -> u64 {
     }
 }
 
+/// Path Semantical Logic: Counts the number of solutions of a 1-argument boolean function,
+///
+/// For more information, see the section "Path Semantical Logic" at the top level documentation.
+///
+/// For 1-argument functions this is the same as normal counting of solutions.
+pub fn path1_count1<F: FnMut(u64) -> u64>(f: &mut F) -> u32 {count1(f)}
+/// Path Semantical Logic: Counts the number of solutions of a 2-argument boolean function,
+///
+/// For more information, see the section "Path Semantical Logic" at the top level documentation.
+///
+/// For 2-argument functions this is the same as normal counting of solutions.
+pub fn path1_count2<F: FnMut(u64, u64) -> u64>(f: &mut F) -> u32 {count2(f)}
+/// Path Semantical Logic: Counts the number of solutions of a 3-argument boolean function,
+///
+/// For more information, see the section "Path Semantical Logic" at the top level documentation.
+///
+/// For 3-argument functions this is the same as normal counting of solutions.
+pub fn path1_count3<F: FnMut((u64, u64), u64) -> u64>(f: &mut F) -> u32 {
+    ((f)((0b00001111,
+          0b00110011),
+          0b01010101,
+    ) & 0b11111111).count_ones()
+}
+/// Path Semantical Logic: Counts the number of solutions of a 4-argument boolean function,
+///
+/// For more information, see the section "Path Semantical Logic" at the top level documentation.
+pub fn path1_count4<F: FnMut((u64, u64), (u64, u64)) -> u64>(f: &mut F) -> u32 {
+    ((f)((0b00000011111111,
+          0b00111100001111),
+         (0b01001100110011,
+          0b01010101010101)
+     ) & 0b11111111111111).count_ones()
+}
+/// Path Semantical Logic: Counts the number of solutions of a 5-argument boolean function,
+///
+/// For more information, see the section "Path Semantical Logic" at the top level documentation.
+pub fn path1_count5<F: FnMut((u64, u64, u64), (u64, u64)) -> u64>(f: &mut F) -> u32 {
+    ((f)((0b000000000011111111111111,
+          0b000011111100000011111111,
+          0b001100111100111100001111),
+         (0b010101001101001100110011,
+          0b010101010101010101010101))
+        & 0b11111_11111_11111_11111_1111).count_ones()
+}
+/// Path Semantical Logic: Counts the number of solutions of a 6-argument boolean function,
+///
+/// For more information, see the section "Path Semantical Logic" at the top level documentation.
+pub fn path1_count6<F: FnMut((u64, u64, u64), (u64, u64, u64)) -> u64>(f: &mut F) -> u32 {
+    ((f)((0b0000000000000011111111111111111111111111,
+          0b0000111111111100000000001111111111111111,
+          0b0011001111111100111111110000000011111111),
+         (0b0101010000111101000011110000111100001111,
+          0b0101010011001101001100110011001100110011,
+          0b0101010101010101010101010101010101010101))
+         & 0b11111_11111_11111_11111_11111_11111_11111_11111).count_ones()
+}
+/// Path Semantical Logic: Counts the number of solutions of a 7-argument boolean function,
+///
+/// For more information, see the section "Path Semantical Logic" at the top level documentation.
+pub fn path1_count7<F: FnMut((u64, u64, u64, u64), (u64, u64, u64)) -> u64>(f: &mut F) -> u32 {
+    ((f)((0b00000000000000000000001111111111111111111111111111111111111111,
+          0b00000000111111111111110000000000000011111111111111111111111111,
+          0b00001111000011111111110000111111111100000000001111111111111111,
+          0b00110011001100111111110011001111111100111111110000000011111111),
+         (0b01010101010101000011110101010000111101000011110000111100001111,
+          0b01010101010101001100110101010011001101001100110011001100110011,
+          0b01010101010101010101010101010101010101010101010101010101010101)
+    ) & 0b11111_11111_11111_11111_11111_11111_11111_11111_11111_11111_11111_11111_11).count_ones()
+}
+/// Path Semantical Logic: Counts the number of solutions of a 8-argument boolean function,
+///
+/// For more information, see the section "Path Semantical Logic" at the top level documentation.
+pub fn path1_count8<F: FnMut((u64, u64, u64, u64), (u64, u64, u64, u64)) -> u64>(f: &mut F) -> u32 {
+    ((f)((0b0000000000000000000000000000001111111111111111111111111111111111,
+          0b0000000011111111111111111111110000000000000000000000111111111111,
+          0b0000111100001111111111111111110000111111111111111111000000000000,
+          0b0011001100110011111111111111110011001111111111111111001111111111),
+         (0b0101010101010100000000111111110101010000000011111111010000000011,
+          0b0101010101010100001111000011110101010000111100001111010000111100,
+          0b0101010101010100110011001100110101010011001100110011010011001100,
+          0b0101010101010101010101010101010101010101010101010101010101010101))).count_ones() +
+    ((f)((0b11111111111111111111111111111111111111,
+          0b11111111111111111111111111111111111111,
+          0b00000011111111111111111111111111111111,
+          0b11111100000000000000001111111111111111),
+         (0b11111100000000111111110000000011111111,
+          0b00111100001111000011110000111100001111,
+          0b11001100110011001100110011001100110011,
+          0b01010101010101010101010101010101010101))
+       & 0b11111_11111_11111_11111_11111_11111_11111_111).count_ones()
+}
+/// Path Semantical Logic: Counts the number of solutions of a 9-argument boolean function,
+///
+/// For more information, see the section "Path Semantical Logic" at the top level documentation.
+pub fn path1_count9<F: FnMut((u64, u64, u64, u64, u64), (u64, u64, u64, u64)) -> u64>(f: &mut F) -> u32 {
+    ((f)((0b0000000000000000000000000000000000000000000000111111111111111111,
+          0b0000000000000000111111111111111111111111111111000000000000000000,
+          0b0000000011111111000000001111111111111111111111000000001111111111,
+          0b0000111100001111000011110000111111111111111111000011110000111111,
+          0b0011001100110011001100110011001111111111111111001100110011001111),
+         (0b0101010101010101010101010101010000000011111111010101010101010000,
+          0b0101010101010101010101010101010000111100001111010101010101010000,
+          0b0101010101010101010101010101010011001100110011010101010101010011,
+          0b0101010101010101010101010101010101010101010101010101010101010101))).count_ones() +
+    ((f)((0b1111111111111111111111111111111111111111111111111111111111111111,
+          0b0000000000001111111111111111111111111111111111111111111111111111,
+          0b1111111111110000000000000000000000111111111111111111111111111111,
+          0b1111111111110000111111111111111111000000000000000000111111111111,
+          0b1111111111110011001111111111111111001111111111111111000000000000),
+         (0b0000111111110101010000000011111111010000000011111111000000001111,
+          0b1111000011110101010000111100001111010000111100001111000011110000,
+          0b0011001100110101010011001100110011010011001100110011001100110011,
+          0b0101010101010101010101010101010101010101010101010101010101010101))).count_ones() +
+    ((f)((0b11111111111111111111,
+          0b11111111111111111111,
+          0b11111111111111111111,
+          0b11111111111111111111,
+          0b00001111111111111111),
+         (0b11110000000011111111,
+          0b11110000111100001111,
+          0b00110011001100110011,
+          0b01010101010101010101))
+        & 0b11111_11111_11111_11111).count_ones()
+}
+/// Path Semantical Logic: Counts the number of solutions of a 10-argument boolean function,
+///
+/// For more information, see the section "Path Semantical Logic" at the top level documentation.
+pub fn path1_count10<F: FnMut((u64, u64, u64, u64, u64), (u64, u64, u64, u64, u64)) -> u64>(f: &mut F) -> u32 {
+    ((f)((0b0000000000000000000000000000000000000000000000000000000000000011,
+          0b0000000000000000111111111111111111111111111111111111111111111100,
+          0b0000000011111111000000001111111111111111111111111111111111111100,
+          0b0000111100001111000011110000111111111111111111111111111111111100,
+          0b0011001100110011001100110011001111111111111111111111111111111100),
+         (0b0101010101010101010101010101010000000000000000111111111111111101,
+          0b0101010101010101010101010101010000000011111111000000001111111101,
+          0b0101010101010101010101010101010000111100001111000011110000111101,
+          0b0101010101010101010101010101010011001100110011001100110011001101,
+          0b0101010101010101010101010101010101010101010101010101010101010101))).count_ones() +
+    ((f)((0b1111111111111111111111111111111111111111111111111111111111111111,
+          0b0000000000000000000000000000000000000000000011111111111111111111,
+          0b0000001111111111111111111111111111111111111100000000000000000000,
+          0b0011110000111111111111111111111111111111111100001111111111111111,
+          0b1100110011001111111111111111111111111111111100110011111111111111),
+         (0b0101010101010000000000000000111111111111111101010100000000000000,
+          0b0101010101010000000011111111000000001111111101010100000000111111,
+          0b0101010101010000111100001111000011110000111101010100001111000011,
+          0b0101010101010011001100110011001100110011001101010100110011001100,
+          0b0101010101010101010101010101010101010101010101010101010101010101))).count_ones() +
+    ((f)((0b1111111111111111111111111111111111111111111111111111111111111111,
+          0b1111111111111111111111111111111111111111111111111111111111111111,
+          0b0000000000000000001111111111111111111111111111111111111111111111,
+          0b1111111111111111110000000000000000000000000000000000111111111111,
+          0b1111111111111111110011111111111111111111111111111111000000000000),
+         (0b0011111111111111110100000000000000001111111111111111000000000000,
+          0b1100000000111111110100000000111111110000000011111111000000001111,
+          0b1100001111000011110100001111000011110000111100001111000011110000,
+          0b1100110011001100110100110011001100110011001100110011001100110011,
+          0b0101010101010101010101010101010101010101010101010101010101010101))).count_ones() +
+    ((f)((0b1111111111111111111111111111111111111111111111111111,
+          0b1111111111111111111111111111111111111111111111111111,
+          0b1111111111111111111111111111111111111111111111111111,
+          0b1111111111111111111111111111111111111111111111111111,
+          0b0000000000000000000011111111111111111111111111111111),
+         (0b0000111111111111111100000000000000001111111111111111,
+          0b1111000000001111111100000000111111110000000011111111,
+          0b1111000011110000111100001111000011110000111100001111,
+          0b0011001100110011001100110011001100110011001100110011,
+          0b0101010101010101010101010101010101010101010101010101))
+        & 0b11111_11111_11111_11111_11111_11111_11111_11111_11111_11111_11).count_ones()
+}
+/// Path Semantical Logic: Counts the number of solutions of a n-argument boolean function,
+///
+/// For more information, see the section "Path Semantical Logic" at the top level documentation.
+pub fn path1_countn(n: usize, fun: &mut dyn FnMut(&[u64], &[u64]) -> u64) -> u64 {
+    match n {
+        0 => fun(&[], &[]).count_ones() as u64,
+        1 => path1_count1(&mut |a| fun(&[a], &[])) as u64,
+        2 => path1_count2(&mut |a, b| fun(&[a], &[b])) as u64,
+        3 => path1_count3(&mut |(a, b), c| fun(&[a, b], &[c])) as u64,
+        4 => path1_count4(&mut |(a, b), (c, d)| fun(&[a, b], &[c, d])) as u64,
+        5 => path1_count5(&mut |(a, b, c), (d, e)| fun(&[a, b, c], &[d, e])) as u64,
+        6 => path1_count6(&mut |(a, b, c), (d, e, f)| fun(&[a, b, c], &[d, e, f])) as u64,
+        7 => path1_count7(&mut |(a, b, c, d), (e, f, g)| fun(&[a, b, c, d], &[e, f, g])) as u64,
+        8 => path1_count8(&mut |(a, b, c, d), (e, f, g, h)| fun(&[a, b, c, d], &[e, f, g, h])) as u64,
+        9 => path1_count9(&mut |(a, b, c, d, e), (f, g, h, i)| fun(&[a, b, c, d, e], &[f, g, h, i])) as u64,
+        10 => path1_count10(&mut |(a, b, c, d, e), (f, g, h, i, j)| fun(&[a, b, c, d, e], &[f, g, h, i, j])) as u64,
+        _ => unimplemented!(),
+    }
+}
+
 /// Returns `true` if proposition is correct, `false` otherwise.
 pub fn prove1<F: FnMut(u64) -> u64>(f: &mut F) -> bool {count1(f) == 2}
 /// Returns `true` if proposition is correct, `false` otherwise.
@@ -223,6 +475,71 @@ pub fn prove10<F: FnMut(u64, u64, u64, u64, u64, u64, u64, u64, u64, u64) -> u64
 /// Returns `true` if proposition is correct, `false` otherwise.
 pub fn proven<F: FnMut(&[u64]) -> u64>(n: usize, f: &mut F) -> bool {
     countn(n, f) == 1 << n
+}
+
+/// Path Semantical Logic: Returns `true` if proposition is correct, `false` otherwise.
+///
+/// For more information, see the section "Path Semantical Logic" at the top level documentation.
+///
+/// For 1-argument functions this is the same as normal theorem proving.
+pub fn path1_prove1<F: FnMut(u64) -> u64>(f: &mut F) -> bool {prove1(f)}
+/// Path Semantical Logic: Returns `true` if proposition is correct, `false` otherwise.
+///
+/// For more information, see the section "Path Semantical Logic" at the top level documentation.
+///
+/// For 2-argument functions this is the same as normal theorem proving.
+pub fn path1_prove2<F: FnMut(u64, u64) -> u64>(f: &mut F) -> bool {prove2(f)}
+/// Path Semantical Logic: Returns `true` if proposition is correct, `false` otherwise.
+///
+/// For more information, see the section "Path Semantical Logic" at the top level documentation.
+pub fn path1_prove3<F: FnMut((u64, u64), u64) -> u64>(f: &mut F) -> bool {path1_count3(f) == 8}
+/// Path Semantical Logic: Returns `true` if proposition is correct, `false` otherwise.
+///
+/// For more information, see the section "Path Semantical Logic" at the top level documentation.
+pub fn path1_prove4<F: FnMut((u64, u64), (u64, u64)) -> u64>(f: &mut F) -> bool {
+    path1_count4(f) == 14
+}
+/// Path Semantical Logic: Returns `true` if proposition is correct, `false` otherwise.
+///
+/// For more information, see the section "Path Semantical Logic" at the top level documentation.
+pub fn path1_prove5<F: FnMut((u64, u64, u64), (u64, u64)) -> u64>(f: &mut F) -> bool {
+    path1_count5(f) == 24
+}
+/// Path Semantical Logic: Returns `true` if proposition is correct, `false` otherwise.
+///
+/// For more information, see the section "Path Semantical Logic" at the top level documentation.
+pub fn path1_prove6<F: FnMut((u64, u64, u64), (u64, u64, u64)) -> u64>(f: &mut F) -> bool {
+    path1_count6(f) == 40
+}
+/// Path Semantical Logic: Returns `true` if proposition is correct, `false` otherwise.
+///
+/// For more information, see the section "Path Semantical Logic" at the top level documentation.
+pub fn path1_prove7<F: FnMut((u64, u64, u64, u64), (u64, u64, u64)) -> u64>(f: &mut F) -> bool {
+    path1_count7(f) == 62
+}
+/// Path Semantical Logic: Returns `true` if proposition is correct, `false` otherwise.
+///
+/// For more information, see the section "Path Semantical Logic" at the top level documentation.
+pub fn path1_prove8<F: FnMut((u64, u64, u64, u64), (u64, u64, u64, u64)) -> u64>(f: &mut F) -> bool {
+    path1_count8(f) == 102
+}
+/// Path Semantical Logic: Returns `true` if proposition is correct, `false` otherwise.
+///
+/// For more information, see the section "Path Semantical Logic" at the top level documentation.
+pub fn path1_prove9<F: FnMut((u64, u64, u64, u64, u64), (u64, u64, u64, u64)) -> u64>(f: &mut F) -> bool {
+    path1_count9(f) == 148
+}
+/// Path Semantical Logic: Returns `true` if proposition is correct, `false` otherwise.
+///
+/// For more information, see the section "Path Semantical Logic" at the top level documentation.
+pub fn path1_prove10<F: FnMut((u64, u64, u64, u64, u64), (u64, u64, u64, u64, u64)) -> u64>(f: &mut F) -> bool {
+    path1_count10(f) == 244
+}
+/// Path Semantical Logic: Returns `true` if proposition is correct, `false` otherwise.
+///
+/// For more information, see the section "Path Semantical Logic" at the top level documentation.
+pub fn path1_proven<F: FnMut(&[u64], &[u64]) -> u64>(_n: usize, _f: &mut F) -> bool {
+    unimplemented!()
 }
 
 /// Returns `T` if `a` is `true`, `F` otherwise.
