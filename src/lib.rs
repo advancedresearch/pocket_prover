@@ -458,7 +458,7 @@ pub fn path1_countn(n: usize, fun: &mut dyn FnMut(&[u64], &[u64]) -> u64) -> u64
             let all_xs_one = countn(f, &mut |fs| fun(fs, &*xs));
             // Set `xs` to first and last case.
             for x in &mut xs {*x = 0b01};
-            // Enumereate all cases when `fs` are ones.
+            // Enumerate all cases when `fs` are ones.
             let mut fs = vec![T; f];
             let mut all_fs_one = countn(x, &mut |xs| fun(&*fs, xs));
             // Subtract first and last case.
