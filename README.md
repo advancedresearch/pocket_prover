@@ -60,3 +60,65 @@ using bit patterns that simulate a truth table of 6 arguments.
 
 To extend to 10 arguments, `T` and `F` are used to alternate the 4 extra arguments.
 To extend to N arguments, recursive calls are used down to less than 10 arguments.
+
+### Path Semantical Logic
+
+*Notice! Path Semantical Logic is at early stage of research.*
+
+This library has experimental support for a subset of Path Semantical Logic.
+Implementation is based on paper [Faster Brute Force Proofs](https://github.com/advancedresearch/path_semantics/blob/master/papers-wip/faster-brute-force-proofs.pdf).
+
+Path Semantical Logic separates propositions into levels,
+such that an equality between two propositions in level N+1,
+propagates into equality between uniquely associated propositions in level N.
+
+For example, if `f` has level 1 and `x` has level 0,
+then `imply(f, x)` associates `x` uniquely with `f`,
+such that the core axiom of [Path Semantics](https://github.com/advancedresearch/path_semantics)
+is satisfied.
+
+This library has currently only support for level 1 and 0.
+These functions are prefixed with `path1_`.
+Each function takes two arguments, consisting of tuples of propositions, e.g. `(f, g), (x, y)`.
+
+- The first tuple has level 1 (ceil(n/2) propositions)
+- The second tuple has level 0 (floor(n/2) propositions)
+
+```rust
+extern crate pocket_prover;
+
+use pocket_prover::*;
+
+fn main() {
+    println!("=== Path Semantical Logic ===");
+    println!("The notation `f(x)` means `x` is uniquely associated with `f`.");
+    println!("For more information, see the section 'Path Semantical Logic' in documentation.");
+    println!("");
+
+    print!("(f(x), g(y), h(z), f=g ⊻ f=h) => (x=y ∨ x=z): ");
+    println!("{}\n", path1_prove6(&mut |(f, g, h), (x, y, z)| {
+        imply(
+            and4(
+                imply(f, x),
+                imply(g, y),
+                imply(h, z),
+                xor(eq(f, g), eq(f, h))
+            ),
+            or(eq(x, y), eq(x, z))
+        )
+    }));
+
+    print!("(f(x), g(y), f=g => h, h(z)) => (x=y => z): ");
+    println!("{}\n", path1_prove6(&mut |(f, g, h), (x, y, z)| {
+        imply(
+            and4(
+                imply(f, x),
+                imply(g, y),
+                imply(eq(f, g), h),
+                imply(h, z)
+            ),
+            imply(eq(x, y), z)
+        )
+    }));
+}
+```
