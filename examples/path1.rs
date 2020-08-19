@@ -9,7 +9,7 @@ fn main() {
     println!("");
 
     print!("(f(x), g(y), h(z), f=g ⊻ f=h) => (x=y ∨ x=z): ");
-    println!("{}\n", path1_prove6(&mut |(f, g, h), (x, y, z)| {
+    println!("{}\n", path1_prove!(&mut |(f, g, h), (x, y, z)| {
         imply(
             and4(
                 imply(f, x),

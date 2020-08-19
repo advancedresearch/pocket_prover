@@ -1,6 +1,6 @@
 [package]
 name = "pocket_prover"
-version = "0.7.1"
+version = "0.8.0"
 authors = ["Sven Nilsen <bvssvni@gmail.com>"]
 keywords = ["prover", "solver", "logic", "first-order"]
 description = "A fast, brute force, automatic theorem prover for first order logic"
@@ -9,5 +9,6 @@ repository = "https://github.com/advancedresearch/pocket_prover.git"
 homepage = "https://github.com/advancedresearch/pocket_prover"
 documentation = "https://docs.rs/pocket_prover"
 readme = "README.md"
+edition = "2018"
 
 [dependencies]

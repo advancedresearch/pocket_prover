@@ -16,13 +16,13 @@ fn main() {
     println!("(God_exists -> good) ∧ (good ¬= evil) ∧ evil");
     println!("--------------------------------------------");
     println!("¬God_exists");
-    println!("Result {}", prove3(&mut |
+    println!("Result {}", prove!(&mut |
         god,
         good,
         evil
     | {
         imply(
-            and3(
+            and!(
                 imply(god, good),
                 not(eq(good, evil)),
                 evil
@@ -36,13 +36,13 @@ fn main() {
     println!("(God_exists -> good) ∧ (good ¬= evil) ∧ evil");
     println!("--------------------------------------------");
     println!("¬good");
-    println!("Result {}", prove3(&mut |
+    println!("Result {}", prove!(&mut |
         god,
         good,
         evil
     | {
         imply(
-            and3(
+            and!(
                 imply(god, good),
                 not(eq(good, evil)),
                 evil
@@ -60,18 +60,18 @@ fn main() {
     println!("");
     println!("(God_exists -> all_good) ∧ (all_good ¬= evil_exists) ∧ evil_exists");
     println!("= ¬God_exists ∧ ¬all_good ∧ evil_exists");
-    println!("Result {}", prove3(&mut |
+    println!("Result {}", prove!(&mut |
         god,
         good,
         evil
     | {
         eq(
-            and3(
+            and!(
                 imply(god, good),
                 not(eq(good, evil)),
                 evil
             ),
-            and3(not(god), not(good), evil)
+            and!(not(god), not(good), evil)
         )
     }));
     println!("");

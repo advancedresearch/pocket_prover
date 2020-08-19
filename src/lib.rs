@@ -12,7 +12,7 @@
 //! use pocket_prover::*;
 //!
 //! fn main() {
-//!     println!("Socrates is mortal: {}", prove3(&mut |man, mortal, socrates| {
+//!     println!("Socrates is mortal: {}", prove!(&mut |man, mortal, socrates| {
 //!         // Using `imply` because we want to prove an inference rule.
 //!         imply(
 //!             // Premises.
@@ -124,6 +124,321 @@
 //!     }));
 //! }
 //! ```
+
+/// An AND relation of variable arguments.
+#[macro_export]
+macro_rules! and(
+    ($x0:expr) => {$x0};
+    ($x0:expr, $x1:expr) => {
+        and($x0, $x1)
+    };
+    ($x0:expr, $x1:expr, $x2:expr) => {
+        and3($x0, $x1, $x2)
+    };
+    ($x0:expr, $x1:expr, $x2:expr, $x3:expr) => {
+        and4($x0, $x1, $x2, $x3)
+    };
+    ($x0:expr, $x1:expr, $x2:expr, $x3:expr, $x4:expr) => {
+        and5($x0, $x1, $x2, $x3, $x4)
+    };
+    ($x0:expr, $x1:expr, $x2:expr, $x3:expr, $x4:expr, $x5:expr) => {
+        and6($x0, $x1, $x2, $x3, $x4, $x5)
+    };
+    ($x0:expr, $x1:expr, $x2:expr, $x3:expr, $x4:expr, $x5:expr, $x6:expr) => {
+        and7($x0, $x1, $x2, $x3, $x4, $x5, $x6)
+    };
+    ($x0:expr, $x1:expr, $x2:expr, $x3:expr, $x4:expr, $x5:expr, $x6:expr, $x7:expr) => {
+        and8($x0, $x1, $x2, $x3, $x4, $x5, $x6, $x7)
+    };
+    ($x0:expr, $x1:expr, $x2:expr, $x3:expr, $x4:expr, $x5:expr, $x6:expr, $x7:expr, $x8:expr) => {
+        and9($x0, $x1, $x2, $x3, $x4, $x5, $x6, $x7, $x8)
+    };
+    ($x0:expr, $x1:expr, $x2:expr, $x3:expr, $x4:expr,
+     $x5:expr, $x6:expr, $x7:expr, $x8:expr, $x9:expr) => {
+        and10($x0, $x1, $x2, $x3, $x4, $x5, $x6, $x7, $x8, $x9)
+    };
+    ($x0:expr, $x1:expr, $x2:expr, $x3:expr, $x4:expr,
+     $x5:expr, $x6:expr, $x7:expr, $x8:expr, $x9:expr, $($y:expr),+) => {
+        and(
+            and10($x0, $x1, $x2, $x3, $x4, $x5, $x6, $x7, $x8, $x9),
+            and!($($y),+)
+        )
+    };
+);
+
+/// An OR relation of variable arguments.
+#[macro_export]
+macro_rules! or(
+    ($x0:expr) => {$x0};
+    ($x0:expr, $x1:expr) => {
+        or($x0, $x1)
+    };
+    ($x0:expr, $x1:expr, $x2:expr) => {
+        or3($x0, $x1, $x2)
+    };
+    ($x0:expr, $x1:expr, $x2:expr, $x3:expr) => {
+        or4($x0, $x1, $x2, $x3)
+    };
+    ($x0:expr, $x1:expr, $x2:expr, $x3:expr, $x4:expr) => {
+        or5($x0, $x1, $x2, $x3, $x4)
+    };
+    ($x0:expr, $x1:expr, $x2:expr, $x3:expr, $x4:expr, $x5:expr) => {
+        or6($x0, $x1, $x2, $x3, $x4, $x5)
+    };
+    ($x0:expr, $x1:expr, $x2:expr, $x3:expr, $x4:expr, $x5:expr, $x6:expr) => {
+        or7($x0, $x1, $x2, $x3, $x4, $x5, $x6)
+    };
+    ($x0:expr, $x1:expr, $x2:expr, $x3:expr, $x4:expr, $x5:expr, $x6:expr, $x7:expr) => {
+        or8($x0, $x1, $x2, $x3, $x4, $x5, $x6, $x7)
+    };
+    ($x0:expr, $x1:expr, $x2:expr, $x3:expr, $x4:expr, $x5:expr, $x6:expr, $x7:expr, $x8:expr) => {
+        or9($x0, $x1, $x2, $x3, $x4, $x5, $x6, $x7, $x8)
+    };
+    ($x0:expr, $x1:expr, $x2:expr, $x3:expr, $x4:expr,
+     $x5:expr, $x6:expr, $x7:expr, $x8:expr, $x9:expr) => {
+        or10($x0, $x1, $x2, $x3, $x4, $x5, $x6, $x7, $x8, $x9)
+    };
+    ($x0:expr, $x1:expr, $x2:expr, $x3:expr, $x4:expr,
+     $x5:expr, $x6:expr, $x7:expr, $x8:expr, $x9:expr, $($y:expr),+) => {
+        or(
+            or10($x0, $x1, $x2, $x3, $x4, $x5, $x6, $x7, $x8, $x9),
+            or!($($y),+)
+        )
+    };
+);
+
+/// An XOR relation of variable arguments.
+#[macro_export]
+macro_rules! xor(
+    ($x0:expr) => {$x0};
+    ($x0:expr, $x1:expr) => {
+        xor($x0, $x1)
+    };
+    ($x0:expr, $x1:expr, $x2:expr) => {
+        xor3($x0, $x1, $x2)
+    };
+    ($x0:expr, $x1:expr, $x2:expr, $x3:expr) => {
+        xor4($x0, $x1, $x2, $x3)
+    };
+    ($x0:expr, $x1:expr, $x2:expr, $x3:expr, $x4:expr) => {
+        xor5($x0, $x1, $x2, $x3, $x4)
+    };
+    ($x0:expr, $x1:expr, $x2:expr, $x3:expr, $x4:expr, $x5:expr) => {
+        xor6($x0, $x1, $x2, $x3, $x4, $x5)
+    };
+    ($x0:expr, $x1:expr, $x2:expr, $x3:expr, $x4:expr, $x5:expr, $x6:expr) => {
+        xor7($x0, $x1, $x2, $x3, $x4, $x5, $x6)
+    };
+    ($x0:expr, $x1:expr, $x2:expr, $x3:expr, $x4:expr, $x5:expr, $x6:expr, $x7:expr) => {
+        xor8($x0, $x1, $x2, $x3, $x4, $x5, $x6, $x7)
+    };
+    ($x0:expr, $x1:expr, $x2:expr, $x3:expr, $x4:expr, $x5:expr, $x6:expr, $x7:expr, $x8:expr) => {
+        xor9($x0, $x1, $x2, $x3, $x4, $x5, $x6, $x7, $x8)
+    };
+    ($x0:expr, $x1:expr, $x2:expr, $x3:expr, $x4:expr,
+     $x5:expr, $x6:expr, $x7:expr, $x8:expr, $x9:expr) => {
+        xor10($x0, $x1, $x2, $x3, $x4, $x5, $x6, $x7, $x8, $x9)
+    };
+    ($x0:expr, $($y:expr),+) => {
+        or(
+            and(not($x0), xor!($($y),+)),
+            not(or(not($x0), or!($($y),+)))
+        )
+    };
+);
+
+/// An IMPLY chain of variable arguments.
+#[macro_export]
+macro_rules! imply(
+    ($x0:expr) => {$x0};
+    ($x0:expr, $x1:expr) => {
+        imply($x0, $x1)
+    };
+    ($x0:expr, $x1:expr, $x2:expr) => {
+        imply3($x0, $x1, $x2)
+    };
+    ($x0:expr, $x1:expr, $x2:expr, $x3:expr) => {
+        imply4($x0, $x1, $x2, $x3)
+    };
+    ($x0:expr, $x1:expr, $x2:expr, $x3:expr, $x4:expr) => {
+        imply5($x0, $x1, $x2, $x3, $x4)
+    };
+    ($x0:expr, $x1:expr, $x2:expr, $x3:expr, $x4:expr, $x5:expr) => {
+        imply6($x0, $x1, $x2, $x3, $x4, $x5)
+    };
+    ($x0:expr, $x1:expr, $x2:expr, $x3:expr, $x4:expr, $x5:expr, $x6:expr) => {
+        imply7($x0, $x1, $x2, $x3, $x4, $x5, $x6)
+    };
+    ($x0:expr, $x1:expr, $x2:expr, $x3:expr, $x4:expr, $x5:expr, $x6:expr, $x7:expr) => {
+        imply8($x0, $x1, $x2, $x3, $x4, $x5, $x6, $x7)
+    };
+    ($x0:expr, $x1:expr, $x2:expr, $x3:expr, $x4:expr, $x5:expr, $x6:expr, $x7:expr, $x8:expr) => {
+        imply9($x0, $x1, $x2, $x3, $x4, $x5, $x6, $x7, $x8)
+    };
+    ($x0:expr, $x1:expr, $x2:expr, $x3:expr, $x4:expr,
+     $x5:expr, $x6:expr, $x7:expr, $x8:expr, $x9:expr) => {
+        imply10($x0, $x1, $x2, $x3, $x4, $x5, $x6, $x7, $x8, $x9)
+    };
+    ($x0:expr, $x1:expr, $($y:expr),+) => {
+        and(imply($x0, $x1), imply!($x1, $($y),+))
+    };
+);
+
+/// Counts the number of solutions of a variable argument boolean function.
+#[macro_export]
+macro_rules! count(
+    (&mut |$x0:ident| $e:expr) => {
+        count1(&mut |$x0| $e)
+    };
+    (&mut |$x0:ident, $x1:ident| $e:expr) => {
+        count2(&mut |$x0, $x1| $e)
+    };
+    (&mut |$x0:ident, $x1:ident, $x2:ident| $e:expr) => {
+        count3(&mut |$x0, $x1, $x2| $e)
+    };
+    (&mut |$x0:ident, $x1:ident, $x2:ident, $x3:ident| $e:expr) => {
+        count4(&mut |$x0, $x1, $x2, $x3| $e)
+    };
+    (&mut |$x0:ident, $x1:ident, $x2:ident, $x3:ident, $x4:ident| $e:expr) => {
+        count5(&mut |$x0, $x1, $x2, $x3, $x4| $e)
+    };
+    (&mut |$x0:ident, $x1:ident, $x2:ident, $x3:ident, $x4:ident, $x5:ident| $e:expr) => {
+        count6(&mut |$x0, $x1, $x2, $x3, $x4, $x5| $e)
+    };
+    (&mut |$x0:ident, $x1:ident, $x2:ident, $x3:ident, $x4:ident,
+           $x5:ident, $x6:ident| $e:expr) => {
+        count7(&mut |$x0, $x1, $x2, $x3, $x4, $x5, $x6| $e)
+    };
+    (&mut |$x0:ident, $x1:ident, $x2:ident, $x3:ident,
+           $x4:ident, $x5:ident, $x6:ident, $x7:ident| $e:expr) => {
+        count8(&mut |$x0, $x1, $x2, $x3, $x4, $x5, $x6, $x7| $e)
+    };
+    (&mut |$x0:ident, $x1:ident, $x2:ident, $x3:ident, $x4:ident,
+           $x5:ident, $x6:ident, $x7:ident, $x8:ident| $e:expr) => {
+        count9(&mut |$x0, $x1, $x2, $x3, $x4, $x5, $x6, $x7, $x8| $e)
+    };
+    (&mut |$x0:ident, $x1:ident, $x2:ident, $x3:ident, $x4:ident,
+           $x5:ident, $x6:ident, $x7:ident, $x8:ident, $x9:ident| $e:expr) => {
+        count10(&mut |$x0, $x1, $x2, $x3, $x4, $x5, $x6, $x7, $x8, $x9| $e)
+    };
+);
+
+/// Path Semantical Logic: Counts the number of solutions of a variable argument boolean function.
+#[macro_export]
+macro_rules! path1_count(
+    (&mut |$x0:ident| $e:expr) => {
+        path1_count1(&mut |$x0| $e)
+    };
+    (&mut |$x0:ident, $x1:ident| $e:expr) => {
+        path1_count2(&mut |$x0, $x1| $e)
+    };
+    (&mut |($x0:ident, $x1:ident), $x2:ident| $e:expr) => {
+        path1_count3(&mut |($x0, $x1), $x2| $e)
+    };
+    (&mut |($x0:ident, $x1:ident), ($x2:ident, $x3:ident)| $e:expr) => {
+        path1_count4(&mut |($x0, $x1), ($x2, $x3)| $e)
+    };
+    (&mut |($x0:ident, $x1:ident, $x2:ident), ($x3:ident, $x4:ident)| $e:expr) => {
+        path1_count5(&mut |($x0, $x1, $x2), ($x3, $x4)| $e)
+    };
+    (&mut |($x0:ident, $x1:ident, $x2:ident), ($x3:ident, $x4:ident, $x5:ident)| $e:expr) => {
+        path1_count6(&mut |($x0, $x1, $x2), ($x3, $x4, $x5)| $e)
+    };
+    (&mut |($x0:ident, $x1:ident, $x2:ident, $x3:ident),
+           ($x4:ident, $x5:ident, $x6:ident)| $e:expr) => {
+        path1_count7(&mut |($x0, $x1, $x2, $x3), ($x4, $x5, $x6)| $e)
+    };
+    (&mut |($x0:ident, $x1:ident, $x2:ident, $x3:ident),
+           ($x4:ident, $x5:ident, $x6:ident, $x7:ident)| $e:expr) => {
+        path1_count8(&mut |($x0, $x1, $x2, $x3), ($x4, $x5, $x6, $x7)| $e)
+    };
+    (&mut |($x0:ident, $x1:ident, $x2:ident, $x3:ident, $x4:ident),
+           ($x5:ident, $x6:ident, $x7:ident, $x8:ident)| $e:expr) => {
+        path1_count9(&mut |($x0, $x1, $x2, $x3, $x4), ($x5, $x6, $x7, $x8)| $e)
+    };
+    (&mut |($x0:ident, $x1:ident, $x2:ident, $x3:ident, $x4:ident),
+           ($x5:ident, $x6:ident, $x7:ident, $x8:ident, $x9:ident)| $e:expr) => {
+        path1_count10(&mut |($x0, $x1, $x2, $x3, $x4), ($x5, $x6, $x7, $x8, $x9)| $e)
+    };
+);
+
+/// Returns `true` if proposition is correct, `false` otherwise.
+#[macro_export]
+macro_rules! prove(
+    (&mut |$x0:ident| $e:expr) => {
+        prove1(&mut |$x0| $e)
+    };
+    (&mut |$x0:ident, $x1:ident| $e:expr) => {
+        prove2(&mut |$x0, $x1| $e)
+    };
+    (&mut |$x0:ident, $x1:ident, $x2:ident| $e:expr) => {
+        prove3(&mut |$x0, $x1, $x2| $e)
+    };
+    (&mut |$x0:ident, $x1:ident, $x2:ident, $x3:ident| $e:expr) => {
+        prove4(&mut |$x0, $x1, $x2, $x3| $e)
+    };
+    (&mut |$x0:ident, $x1:ident, $x2:ident, $x3:ident, $x4:ident| $e:expr) => {
+        prove5(&mut |$x0, $x1, $x2, $x3, $x4| $e)
+    };
+    (&mut |$x0:ident, $x1:ident, $x2:ident, $x3:ident, $x4:ident, $x5:ident| $e:expr) => {
+        prove6(&mut |$x0, $x1, $x2, $x3, $x4, $x5| $e)
+    };
+    (&mut |$x0:ident, $x1:ident, $x2:ident, $x3:ident, $x4:ident,
+           $x5:ident, $x6:ident| $e:expr) => {
+        prove7(&mut |$x0, $x1, $x2, $x3, $x4, $x5, $x6| $e)
+    };
+    (&mut |$x0:ident, $x1:ident, $x2:ident, $x3:ident,
+           $x4:ident, $x5:ident, $x6:ident, $x7:ident| $e:expr) => {
+        prove8(&mut |$x0, $x1, $x2, $x3, $x4, $x5, $x6, $x7| $e)
+    };
+    (&mut |$x0:ident, $x1:ident, $x2:ident, $x3:ident, $x4:ident,
+           $x5:ident, $x6:ident, $x7:ident, $x8:ident| $e:expr) => {
+        prove9(&mut |$x0, $x1, $x2, $x3, $x4, $x5, $x6, $x7, $x8| $e)
+    };
+    (&mut |$x0:ident, $x1:ident, $x2:ident, $x3:ident, $x4:ident,
+           $x5:ident, $x6:ident, $x7:ident, $x8:ident, $x9:ident| $e:expr) => {
+        prove10(&mut |$x0, $x1, $x2, $x3, $x4, $x5, $x6, $x7, $x8, $x9| $e)
+    };
+);
+
+/// Path Semantical Logic: Returns `true` if proposition is correct, `false` otherwise.
+#[macro_export]
+macro_rules! path1_prove(
+    (&mut |$x0:ident| $e:expr) => {
+        path1_prove1(&mut |$x0| $e)
+    };
+    (&mut |$x0:ident, $x1:ident| $e:expr) => {
+        path1_prove2(&mut |$x0, $x1| $e)
+    };
+    (&mut |($x0:ident, $x1:ident), $x2:ident| $e:expr) => {
+        path1_prove3(&mut |($x0, $x1), $x2| $e)
+    };
+    (&mut |($x0:ident, $x1:ident), ($x2:ident, $x3:ident)| $e:expr) => {
+        path1_prove4(&mut |($x0, $x1), ($x2, $x3)| $e)
+    };
+    (&mut |($x0:ident, $x1:ident, $x2:ident), ($x3:ident, $x4:ident)| $e:expr) => {
+        path1_prove5(&mut |($x0, $x1, $x2), ($x3, $x4)| $e)
+    };
+    (&mut |($x0:ident, $x1:ident, $x2:ident), ($x3:ident, $x4:ident, $x5:ident)| $e:expr) => {
+        path1_prove6(&mut |($x0, $x1, $x2), ($x3, $x4, $x5)| $e)
+    };
+    (&mut |($x0:ident, $x1:ident, $x2:ident, $x3:ident),
+           ($x4:ident, $x5:ident, $x6:ident)| $e:expr) => {
+        path1_prove7(&mut |($x0, $x1, $x2, $x3), ($x4, $x5, $x6)| $e)
+    };
+    (&mut |($x0:ident, $x1:ident, $x2:ident, $x3:ident),
+           ($x4:ident, $x5:ident, $x6:ident, $x7:ident)| $e:expr) => {
+        path1_prove8(&mut |($x0, $x1, $x2, $x3), ($x4, $x5, $x6, $x7)| $e)
+    };
+    (&mut |($x0:ident, $x1:ident, $x2:ident, $x3:ident, $x4:ident),
+           ($x5:ident, $x6:ident, $x7:ident, $x8:ident)| $e:expr) => {
+        path1_prove9(&mut |($x0, $x1, $x2, $x3, $x4), ($x5, $x6, $x7, $x8)| $e)
+    };
+    (&mut |($x0:ident, $x1:ident, $x2:ident, $x3:ident, $x4:ident),
+           ($x5:ident, $x6:ident, $x7:ident, $x8:ident, $x9:ident)| $e:expr) => {
+        path1_prove10(&mut |($x0, $x1, $x2, $x3, $x4), ($x5, $x6, $x7, $x8, $x9)| $e)
+    };
+);
 
 /// The False proposition.
 /// Used to alternate higher than 6 arguments, set to `0`.
@@ -647,36 +962,36 @@ pub fn true_10(
     _: u64, _: u64, _: u64, _: u64, _: u64
 ) -> u64 {T}
 
-/// And and relation of 3 argument.
+/// An AND relation of 3 argument.
 pub fn and3(a: u64, b: u64, c: u64) -> u64 {and(and(a, b), c)}
-/// An and relation of 4 arguments.
+/// An AND relation of 4 arguments.
 pub fn and4(a: u64, b: u64, c: u64, d: u64) -> u64 {and(and(a, b), and(c, d))}
-/// An and relation of 5 arguments.
+/// An AND relation of 5 arguments.
 pub fn and5(a: u64, b: u64, c: u64, d: u64, e: u64) -> u64 {and(and(a, b), and3(c, d, e))}
-/// An and relation of 6 arguments.
+/// An AND relation of 6 arguments.
 pub fn and6(a: u64, b: u64, c: u64, d: u64, e: u64, f: u64) -> u64 {
     and(and3(a, b, c), and3(d, e, f))
 }
-/// An and relation of 7 arguments.
+/// An AND relation of 7 arguments.
 pub fn and7(a: u64, b: u64, c: u64, d: u64, e: u64, f: u64, g: u64) -> u64 {
     and(and4(a, b, c, d), and3(e, f, g))
 }
-/// An and relation of 8 arguments.
+/// An AND relation of 8 arguments.
 pub fn and8(a: u64, b: u64, c: u64, d: u64, e: u64, f: u64, g: u64, h: u64) -> u64 {
     and(and4(a, b, c, d), and4(e, f, g, h))
 }
-/// An and relation of 9 arguments.
+/// An AND relation of 9 arguments.
 pub fn and9(a: u64, b: u64, c: u64, d: u64, e: u64, f: u64, g: u64, h: u64, i: u64) -> u64 {
     and(and5(a, b, c, d, e), and4(f, g, h, i))
 }
-/// An and relation of 10 arguments.
+/// An AND relation of 10 arguments.
 pub fn and10(
     a: u64, b: u64, c: u64, d: u64, e: u64,
     f: u64, g: u64, h: u64, i: u64, j: u64
 ) -> u64 {
     and(and5(a, b, c, d, e), and5(f, g, h, i, j))
 }
-/// An and relation of variable number of arguments.
+/// An AND relation of variable number of arguments.
 pub fn andn(vs: &[u64]) -> u64 {
     match vs.len() {
         0 => T,
@@ -694,34 +1009,34 @@ pub fn andn(vs: &[u64]) -> u64 {
     }
 }
 
-/// An or relation of 3 arguments.
+/// An OR relation of 3 arguments.
 pub fn or3(a: u64, b: u64, c: u64) -> u64 {or(or(a, b), c)}
-/// An or relation of 4 arguments.
+/// An OR relation of 4 arguments.
 pub fn or4(a: u64, b: u64, c: u64, d: u64) -> u64 {or(or(a, b), or(c, d))}
-/// An or relation of 5 arguments.
+/// An OR relation of 5 arguments.
 pub fn or5(a: u64, b: u64, c: u64, d: u64, e: u64) -> u64 {or(or3(a, b, c), or(d, e))}
-/// An or relation of 6 arguments.
+/// An OR relation of 6 arguments.
 pub fn or6(a: u64, b: u64, c: u64, d: u64, e: u64, f: u64) -> u64 {or(or3(a, b, c), or3(d, e, f))}
-/// An or relation of 7 arguments.
+/// An OR relation of 7 arguments.
 pub fn or7(a: u64, b: u64, c: u64, d: u64, e: u64, f: u64, g: u64) -> u64 {
     or(or4(a, b, c, d), or3(e, f, g))
 }
-/// An or relation of 8 arguments.
+/// An OR relation of 8 arguments.
 pub fn or8(a: u64, b: u64, c: u64, d: u64, e: u64, f: u64, g: u64, h: u64) -> u64 {
     or(or4(a, b, c, d), or4(e, f, g, h))
 }
-/// An or relation of 9 arguments.
+/// An OR relation of 9 arguments.
 pub fn or9(a: u64, b: u64, c: u64, d: u64, e: u64, f: u64, g: u64, h: u64, i: u64) -> u64 {
     or(or5(a, b, c, d, e), or4(f, g, h, i))
 }
-/// An or relation of 10 arguments.
+/// An OR relation of 10 arguments.
 pub fn or10(
     a: u64, b: u64, c: u64, d: u64, e: u64,
     f: u64, g: u64, h: u64, i: u64, j: u64
 ) -> u64 {
     or(or5(a, b, c, d, e), or5(f, g, h, i, j))
 }
-/// An or relation of variable number of arguments.
+/// An OR relation of variable number of arguments.
 pub fn orn(vs: &[u64]) -> u64 {
     match vs.len() {
         0 => F,
@@ -739,56 +1054,56 @@ pub fn orn(vs: &[u64]) -> u64 {
     }
 }
 
-/// An xor relation of 3 arguments.
+/// An XOR relation of 3 arguments.
 pub fn xor3(a: u64, b: u64, c: u64) -> u64 {
     or(
         and(xor(a, b), not(c)),
         not(or3(a, b, not(c)))
     )
 }
-/// An xor relation of 4 arguments.
+/// An XOR relation of 4 arguments.
 pub fn xor4(a: u64, b: u64, c: u64, d: u64) -> u64 {
     or(
         and(xor3(a, b, c), not(d)),
         not(or4(a, b, c, not(d)))
     )
 }
-/// An xor relation of 5 arguments.
+/// An XOR relation of 5 arguments.
 pub fn xor5(a: u64, b: u64, c: u64, d: u64, e: u64) -> u64 {
     or(
         and(xor4(a, b, c, d), not(e)),
         not(or5(a, b, c, d, not(e)))
     )
 }
-/// An xor relation of 6 arguments.
+/// An XOR relation of 6 arguments.
 pub fn xor6(a: u64, b: u64, c: u64, d: u64, e: u64, f: u64) -> u64 {
     or(
         and(xor5(a, b, c, d, e), not(f)),
         not(or6(a, b, c, d, e, not(f)))
     )
 }
-/// An xor relation of 7 arguments.
+/// An XOR relation of 7 arguments.
 pub fn xor7(a: u64, b: u64, c: u64, d: u64, e: u64, f: u64, g: u64) -> u64 {
     or(
         and(xor6(a, b, c, d, e, f), not(g)),
         not(or7(a, b, c, d, e, f, not(g)))
     )
 }
-/// An xor relation of 8 arguments.
+/// An XOR relation of 8 arguments.
 pub fn xor8(a: u64, b: u64, c: u64, d: u64, e: u64, f: u64, g: u64, h: u64) -> u64 {
     or(
         and(xor7(a, b, c, d, e, f, g), not(h)),
         not(or8(a, b, c, d, e, f, g, not(h)))
     )
 }
-/// An xor relation of 9 arguments.
+/// An XOR relation of 9 arguments.
 pub fn xor9(a: u64, b: u64, c: u64, d: u64, e: u64, f: u64, g: u64, h: u64, i: u64) -> u64 {
     or(
         and(xor8(a, b, c, d, e, f, g, h), not(i)),
         not(or9(a, b, c, d, e, f, g, h, not(i)))
     )
 }
-/// An xor relation of 10 arguments.
+/// An XOR relation of 10 arguments.
 pub fn xor10(
     a: u64, b: u64, c: u64, d: u64, e: u64,
     f: u64, g: u64, h: u64, i: u64, j: u64
@@ -798,7 +1113,7 @@ pub fn xor10(
         not(or10(a, b, c, d, e, f, g, h, i, not(j)))
     )
 }
-/// An xor relation of variable number of arguments.
+/// An XOR relation of variable number of arguments.
 pub fn xorn(vs: &[u64]) -> u64 {
     match vs.len() {
         0 => F,
@@ -814,41 +1129,41 @@ pub fn xorn(vs: &[u64]) -> u64 {
         10 => xor10(vs[0], vs[1], vs[2], vs[3], vs[4], vs[5], vs[6], vs[7], vs[8], vs[9]),
         x => {
             or(
-                and(xorn(&vs[..x]), not(vs[x-1])),
-                not(or(orn(&vs[..x]), not(vs[x-1])))
+                and(xorn(&vs[..x-1]), not(vs[x-1])),
+                not(or(orn(&vs[..x-1]), not(vs[x-1])))
             )
         }
     }
 }
 
-/// An imply chain of 3 arguments.
+/// An IMPLY chain of 3 arguments.
 pub fn imply3(a: u64, b: u64, c: u64) -> u64 {and(imply(a, b), imply(b, c))}
-/// An imply chain of 4 arguments.
+/// An IMPLY chain of 4 arguments.
 pub fn imply4(a: u64, b: u64, c: u64, d: u64) -> u64 {
     and3(imply(a, b), imply(b, c), imply(c, d))
 }
-/// An imply chain of 5 arguments.
+/// An IMPLY chain of 5 arguments.
 pub fn imply5(a: u64, b: u64, c: u64, d: u64, e: u64) -> u64 {
     and4(imply(a, b), imply(b, c), imply(c, d), imply(d, e))
 }
-/// An imply chain of 6 arguments.
+/// An IMPLY chain of 6 arguments.
 pub fn imply6(a: u64, b: u64, c: u64, d: u64, e: u64, f: u64) -> u64 {
     and5(imply(a, b), imply(b, c), imply(c, d), imply(d, e), imply(e, f))
 }
-/// An imply chain of 7 arguments.
+/// An IMPLY chain of 7 arguments.
 pub fn imply7(a: u64, b: u64, c: u64, d: u64, e: u64, f: u64, g: u64) -> u64 {
     and6(imply(a, b), imply(b, c), imply(c, d), imply(d, e), imply(e, f), imply(f, g))
 }
-/// An imply chain of 8 arguments.
+/// An IMPLY chain of 8 arguments.
 pub fn imply8(a: u64, b: u64, c: u64, d: u64, e: u64, f: u64, g: u64, h: u64) -> u64 {
     and7(imply(a, b), imply(b, c), imply(c, d), imply(d, e), imply(e, f), imply(f, g), imply(g, h))
 }
-/// An imply chain of 9 arguments.
+/// An IMPLY chain of 9 arguments.
 pub fn imply9(a: u64, b: u64, c: u64, d: u64, e: u64, f: u64, g: u64, h: u64, i: u64) -> u64 {
     and8(imply(a, b), imply(b, c), imply(c, d), imply(d, e),
          imply(e, f), imply(f, g), imply(g, h), imply(h, i))
 }
-/// An imply chain of 10 arguments.
+/// An IMPLY chain of 10 arguments.
 pub fn imply10(
     a: u64, b: u64, c: u64, d: u64, e: u64,
     f: u64, g: u64, h: u64, i: u64, j: u64,
@@ -856,7 +1171,7 @@ pub fn imply10(
     and9(imply(a, b), imply(b, c), imply(c, d), imply(d, e),
          imply(e, f), imply(f, g), imply(g, h), imply(h, i), imply(i, j))
 }
-/// An imply chain of variable number of arguments.
+/// An IMPLY chain of variable number of arguments.
 pub fn implyn(vs: &[u64]) -> u64 {
     match vs.len() {
         0 => T,
@@ -871,7 +1186,7 @@ pub fn implyn(vs: &[u64]) -> u64 {
         9 => imply9(vs[0], vs[1], vs[2], vs[3], vs[4], vs[5], vs[6], vs[7], vs[8]),
         10 => imply10(vs[0], vs[1], vs[2], vs[3], vs[4], vs[5], vs[6], vs[7], vs[8], vs[9]),
         x => {
-            and(implyn(&vs[..x]), imply(vs[x-2], vs[x-1]))
+            and(implyn(&vs[..x-1]), imply(vs[x-2], vs[x-1]))
         }
     }
 }
