@@ -5,64 +5,64 @@ use pocket_prover::*;
 fn main() {
     println!("Inference rules:");
     // Truth value can be derived from any premise.
-    println!("  true-conclusion: {}", prove1(&mut |a| imply(
+    println!("  true-conclusion: {}", prove!(&mut |a| imply(
         a,
         T
     )));
     // Anything can be derived from a false premise.
-    println!("  false-premise: {}", prove1(&mut |a| imply(
+    println!("  false-premise: {}", prove!(&mut |a| imply(
         F,
         a
     )));
 
-    println!("  modus-ponens: {}", prove2(&mut |p, q| imply(
+    println!("  modus-ponens: {}", prove!(&mut |p, q| imply(
         and(
             imply(p, q),
             p,
         ),
         q
     )));
-    println!("  modus-tollens: {}", prove2(&mut |p, q| imply(
+    println!("  modus-tollens: {}", prove!(&mut |p, q| imply(
         and(
             imply(p, q),
             not(q)
         ),
         not(p)
     )));
-    println!("  hypothetical-syllogism: {}", prove3(&mut |p, q, r| imply(
+    println!("  hypothetical-syllogism: {}", prove!(&mut |p, q, r| imply(
         and(
             imply(p, q),
             imply(q, r),
         ),
         imply(p, r)
     )));
-    println!("  disjunctive-syllogism: {}", prove2(&mut |p, q| imply(
+    println!("  disjunctive-syllogism: {}", prove!(&mut |p, q| imply(
         and(
             or(p, q),
             not(p),
         ),
         q
     )));
-    println!("  addition: {}", prove2(&mut |p, q| imply(
+    println!("  addition: {}", prove!(&mut |p, q| imply(
         p,
         or(p, q)
     )));
-    println!("  simplification: {}", prove2(&mut |p, q| imply(
+    println!("  simplification: {}", prove!(&mut |p, q| imply(
         and(p, q),
         p
     )));
-    println!("  conjunction: {}", prove2(&mut |p, q| imply(
+    println!("  conjunction: {}", prove!(&mut |p, q| imply(
         and(
             p,
             q,
         ),
         and(p, q)
     )));
-    println!("  resolution: {}", prove3(&mut |p, q, r| imply(
+    println!("  resolution: {}", prove!(&mut |p, q, r| imply(
         and(
             or(not(p), r),
             or(p, q),
         ),
-        or(p, r)
+        or(q, r)
     )));
 }
