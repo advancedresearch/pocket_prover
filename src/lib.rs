@@ -758,39 +758,46 @@ pub fn path1_countn(n: usize, fun: &mut dyn FnMut(&[u64], &[u64]) -> u64) -> u64
         9 => path1_count9(&mut |(a, b, c, d, e), (f, g, h, i)| fun(&[a, b, c, d, e], &[f, g, h, i])) as u64,
         10 => path1_count10(&mut |(a, b, c, d, e), (f, g, h, i, j)| fun(&[a, b, c, d, e], &[f, g, h, i, j])) as u64,
         n => {
-            // Reuse `countn` with a few redundant edge cases.
-            // The redundant edge cases are subtracted to get correct count.
-            //
-            // This algorithm was derived by analyzing the time complexity formula:
-            // https://github.com/advancedresearch/path_semantics/blob/master/papers-wip/complexity-of-path-semantical-logic.pdf
             let x = n / 2;
             let f = n - x;
-            let mut xs = vec![0; x];
-            // Enumerate all cases when `xs` are zero.
-            let all_xs_zero = countn(f, &mut |fs| fun(fs, &*xs));
-            // Enumerate all cases when `xs` are ones.
-            for x in &mut xs {*x = T};
-            let all_xs_one = countn(f, &mut |fs| fun(fs, &*xs));
-            // Set `xs` to first and last case.
-            for x in &mut xs {*x = 0b01};
-            // Enumerate all cases when `fs` are ones.
-            let mut fs = vec![T; f];
-            let mut all_fs_one = countn(x, &mut |xs| fun(&*fs, xs));
-            // Subtract first and last case.
-            all_fs_one -= (fun(&*fs, &*xs) & 0b11).count_ones() as u64;
-            let mut sum_fs_zero = 0;
-            // Set one zero in `fs` by turn.
-            for i in 0..f {
-                fs[i] = F;
-                // Enumerate all cases when there is one zero in `fs`.
-                sum_fs_zero += countn(x, &mut |xs| fun(&*fs, xs));
-                // Subtract first and last case.
-                sum_fs_zero -= (fun(&*fs, &*xs) & 0b11).count_ones() as u64;
-                fs[i] = T;
-            }
-            all_xs_zero + all_xs_one + all_fs_one + sum_fs_zero
+            path1_countnm(f, x, fun)
         }
     }
+}
+
+/// Path Semantical Logic: Counts the number of solutions of a n+m-argument boolean function,
+///
+/// For more information, see the section "Path Semantical Logic" at the top level documentation.
+pub fn path1_countnm(f: usize, x: usize, fun: &mut dyn FnMut(&[u64], &[u64]) -> u64) -> u64 {
+    // Reuse `countn` with a few redundant edge cases.
+    // The redundant edge cases are subtracted to get correct count.
+    //
+    // This algorithm was derived by analyzing the time complexity formula:
+    // https://github.com/advancedresearch/path_semantics/blob/master/papers-wip/complexity-of-path-semantical-logic.pdf
+    let mut xs = vec![0; x];
+    // Enumerate all cases when `xs` are zero.
+    let all_xs_zero = countn(f, &mut |fs| fun(fs, &*xs));
+    // Enumerate all cases when `xs` are ones.
+    for x in &mut xs {*x = T};
+    let all_xs_one = countn(f, &mut |fs| fun(fs, &*xs));
+    // Set `xs` to first and last case.
+    for x in &mut xs {*x = 0b01};
+    // Enumerate all cases when `fs` are ones.
+    let mut fs = vec![T; f];
+    let mut all_fs_one = countn(x, &mut |xs| fun(&*fs, xs));
+    // Subtract first and last case.
+    all_fs_one -= (fun(&*fs, &*xs) & 0b11).count_ones() as u64;
+    let mut sum_fs_zero = 0;
+    // Set one zero in `fs` by turn.
+    for i in 0..f {
+        fs[i] = F;
+        // Enumerate all cases when there is one zero in `fs`.
+        sum_fs_zero += countn(x, &mut |xs| fun(&*fs, xs));
+        // Subtract first and last case.
+        sum_fs_zero -= (fun(&*fs, &*xs) & 0b11).count_ones() as u64;
+        fs[i] = T;
+    }
+    all_xs_zero + all_xs_one + all_fs_one + sum_fs_zero
 }
 
 /// Returns `true` if proposition is correct, `false` otherwise.
@@ -886,12 +893,26 @@ pub fn path1_prove10<F: FnMut((u64, u64, u64, u64, u64), (u64, u64, u64, u64, u6
 ///
 /// For more information, see the section "Path Semantical Logic" at the top level documentation.
 pub fn path1_proven<F: FnMut(&[u64], &[u64]) -> u64>(n: usize, fun: &mut F) -> bool {
-    let x = n as u32 / 2;
-    let f = n as u32 - x;
-    // For proof of formula,
-    // see https://github.com/advancedresearch/path_semantics/blob/master/papers-wip/complexity-of-path-semantical-logic.pdf
-    let s = 2_u64.pow(1 + f) + (1 + f as u64) * (2_u64.pow(x) - 2);
-    path1_countn(n, fun) == s
+    let x = n / 2;
+    let f = n - x;
+    path1_countn(n, fun) == path1_lennm(f, x)
+}
+
+/// Path Semantical Logic: Computes number of cases.
+///
+/// For proof of formula,
+/// see https://github.com/advancedresearch/path_semantics/blob/master/papers-wip/complexity-of-path-semantical-logic.pdf
+pub fn path1_lennm(f: usize, x: usize) -> u64 {
+    let f = f as u32;
+    let x = x as u32;
+    2_u64.pow(1 + f) + (1 + f as u64) * (2_u64.pow(x) - 2)
+}
+
+/// Path Semantical Logic: Returns `true` if proposition is correct, `false` otherwise.
+///
+/// For more information, see the section "Path Semantical Logic" at the top level documentation.
+pub fn path1_provenm<F: FnMut(&[u64], &[u64]) -> u64>(f: usize, x: usize, fun: &mut F) -> bool {
+    path1_countnm(f, x, fun) == path1_lennm(f, x)
 }
 
 /// Returns `T` if `a` is `true`, `F` otherwise.
