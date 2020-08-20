@@ -321,6 +321,12 @@ macro_rules! count(
            $x5:ident, $x6:ident, $x7:ident, $x8:ident, $x9:ident| $e:expr) => {
         count10(&mut |$x0, $x1, $x2, $x3, $x4, $x5, $x6, $x7, $x8, $x9| $e)
     };
+    (&mut |$($x:ident),+| $e:expr) => {
+        countn(tup_count!($($x),+), &mut |x| {
+            tup_set!(x, ($($x),+));
+            $e
+        })
+    };
 );
 
 /// Helper macro for counting size of a tuple.
@@ -425,6 +431,12 @@ macro_rules! prove(
     (&mut |$x0:ident, $x1:ident, $x2:ident, $x3:ident, $x4:ident,
            $x5:ident, $x6:ident, $x7:ident, $x8:ident, $x9:ident| $e:expr) => {
         prove10(&mut |$x0, $x1, $x2, $x3, $x4, $x5, $x6, $x7, $x8, $x9| $e)
+    };
+    (&mut |$($x:ident),+| $e:expr) => {
+        proven(tup_count!($($x),+), &mut |x| {
+            tup_set!(x, ($($x),+));
+            $e
+        })
     };
 );
 
