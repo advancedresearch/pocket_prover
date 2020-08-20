@@ -323,6 +323,26 @@ macro_rules! count(
     };
 );
 
+/// Helper macro for counting size of a tuple.
+#[macro_export]
+macro_rules! tup_count(
+    () => {0};
+    ($x0:ident $(, $y:ident)*) => {1 + tup_count!($($y),*)};
+);
+
+/// Helper macro for binding to a tuple pattern.
+#[macro_export]
+macro_rules! tup_set(
+    ($f:ident, ($($x:ident),*)) => {tup_set!($f, 0, ($($x),*))};
+    ($f:ident, $offset:expr, ($x0:ident)) => {
+        let $x0 = $f[$offset];
+    };
+    ($f:ident, $offset:expr, ($x0:ident, $($y:ident),*)) => {
+        let $x0 = $f[$offset];
+        tup_set!($f, $offset+1, ($($y),*))
+    };
+);
+
 /// Path Semantical Logic: Counts the number of solutions of a variable argument boolean function.
 #[macro_export]
 macro_rules! path1_count(
@@ -359,6 +379,13 @@ macro_rules! path1_count(
     (&mut |($x0:ident, $x1:ident, $x2:ident, $x3:ident, $x4:ident),
            ($x5:ident, $x6:ident, $x7:ident, $x8:ident, $x9:ident)| $e:expr) => {
         path1_count10(&mut |($x0, $x1, $x2, $x3, $x4), ($x5, $x6, $x7, $x8, $x9)| $e)
+    };
+    (&mut |($($x:ident),+), ($($y:ident),+)| $e:expr) => {
+        path1_countnm(tup_count!($($x),+), tup_count!($($y),+), &mut |f, x| {
+            tup_set!(f, ($($x),+));
+            tup_set!(x, ($($y),+));
+            $e
+        })
     };
 );
 
@@ -437,6 +464,13 @@ macro_rules! path1_prove(
     (&mut |($x0:ident, $x1:ident, $x2:ident, $x3:ident, $x4:ident),
            ($x5:ident, $x6:ident, $x7:ident, $x8:ident, $x9:ident)| $e:expr) => {
         path1_prove10(&mut |($x0, $x1, $x2, $x3, $x4), ($x5, $x6, $x7, $x8, $x9)| $e)
+    };
+    (&mut |($($x:ident),+), ($($y:ident),+)| $e:expr) => {
+        path1_provenm(tup_count!($($x),+), tup_count!($($y),+), &mut |f, x| {
+            tup_set!(f, ($($x),+));
+            tup_set!(x, ($($y),+));
+            $e
+        })
     };
 );
 
