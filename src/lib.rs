@@ -67,7 +67,7 @@
 //!
 //! *Notice! Path Semantical Logic is at early stage of research.*
 //!
-//! This library has experimental support for a subset of Path Semantical Logic.
+//! This library has experimental support for a subset of [Path Semantical Logic](https://github.com/advancedresearch/path_semantics/blob/master/sequences.md#path-semantical-logic).
 //! Implementation is based on paper [Faster Brute Force Proofs](https://github.com/advancedresearch/path_semantics/blob/master/papers-wip/faster-brute-force-proofs.pdf).
 //!
 //! Path Semantical Logic separates propositions into levels,
@@ -81,10 +81,12 @@
 //!
 //! This library has currently only support for level 1 and 0.
 //! These functions are prefixed with `path1_`.
-//! Each function takes two arguments, consisting of tuples of propositions, e.g. `(f, g), (x, y)`.
 //!
-//! - The first tuple has level 1 (ceil(n/2) propositions)
-//! - The second tuple has level 0 (floor(n/2) propositions)
+//! The macros `count!` and `prove!` with automatically expand
+//! to `path1_count!` and `path1_prove!`.
+//!
+//! Each function takes two arguments, consisting of tuples of propositions, e.g. `(f, g), (x, y)`.
+//! Arbitrary number of arguments is supported.
 //!
 //! ```rust
 //! extern crate pocket_prover;
@@ -98,9 +100,9 @@
 //!     println!("");
 //!
 //!     print!("(f(x), g(y), h(z), f=g ⊻ f=h) => (x=y ∨ x=z): ");
-//!     println!("{}\n", path1_prove6(&mut |(f, g, h), (x, y, z)| {
+//!     println!("{}\n", prove!(&mut |(f, g, h), (x, y, z)| {
 //!         imply(
-//!             and4(
+//!             and!(
 //!                 imply(f, x),
 //!                 imply(g, y),
 //!                 imply(h, z),
@@ -111,9 +113,9 @@
 //!     }));
 //!
 //!     print!("(f(x), g(y), f=g => h, h(z)) => (x=y => z): ");
-//!     println!("{}\n", path1_prove6(&mut |(f, g, h), (x, y, z)| {
+//!     println!("{}\n", prove!(&mut |(f, g, h), (x, y, z)| {
 //!         imply(
-//!             and4(
+//!             and!(
 //!                 imply(f, x),
 //!                 imply(g, y),
 //!                 imply(eq(f, g), h),
@@ -285,6 +287,8 @@ macro_rules! imply(
 );
 
 /// Counts the number of solutions of a variable argument boolean function.
+///
+/// Expands automatically to Path Semantical Logic when using tuples as arguments.
 #[macro_export]
 macro_rules! count(
     (&mut |$x0:ident| $e:expr) => {
@@ -326,6 +330,9 @@ macro_rules! count(
             tup_set!(x, ($($x),+));
             $e
         })
+    };
+    (&mut |($($x:ident),+), ($($y:ident),+)| $e:expr) => {
+        path1_count!(&mut |($($x),+), ($($y),+)| $e)
     };
 );
 
@@ -396,6 +403,8 @@ macro_rules! path1_count(
 );
 
 /// Returns `true` if proposition is correct, `false` otherwise.
+///
+/// Expands automatically to Path Semantical Logic when using tuples as arguments.
 #[macro_export]
 macro_rules! prove(
     (&mut |$x0:ident| $e:expr) => {
@@ -437,6 +446,9 @@ macro_rules! prove(
             tup_set!(x, ($($x),+));
             $e
         })
+    };
+    (&mut |($($x:ident),+), ($($y:ident),+)| $e:expr) => {
+        path1_prove!(&mut |($($x),+), ($($y),+)| $e)
     };
 );
 
