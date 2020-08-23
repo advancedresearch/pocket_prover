@@ -131,36 +131,37 @@
 #[macro_export]
 macro_rules! and(
     ($x0:expr) => {$x0};
-    ($x0:expr, $x1:expr) => {
+    ($x0:expr, $x1:expr $(,)?) => {
         and($x0, $x1)
     };
-    ($x0:expr, $x1:expr, $x2:expr) => {
+    ($x0:expr, $x1:expr, $x2:expr $(,)?) => {
         and3($x0, $x1, $x2)
     };
-    ($x0:expr, $x1:expr, $x2:expr, $x3:expr) => {
+    ($x0:expr, $x1:expr, $x2:expr, $x3:expr $(,)?) => {
         and4($x0, $x1, $x2, $x3)
     };
-    ($x0:expr, $x1:expr, $x2:expr, $x3:expr, $x4:expr) => {
+    ($x0:expr, $x1:expr, $x2:expr, $x3:expr, $x4:expr $(,)?) => {
         and5($x0, $x1, $x2, $x3, $x4)
     };
-    ($x0:expr, $x1:expr, $x2:expr, $x3:expr, $x4:expr, $x5:expr) => {
+    ($x0:expr, $x1:expr, $x2:expr, $x3:expr, $x4:expr, $x5:expr $(,)?) => {
         and6($x0, $x1, $x2, $x3, $x4, $x5)
     };
-    ($x0:expr, $x1:expr, $x2:expr, $x3:expr, $x4:expr, $x5:expr, $x6:expr) => {
+    ($x0:expr, $x1:expr, $x2:expr, $x3:expr, $x4:expr, $x5:expr, $x6:expr $(,)?) => {
         and7($x0, $x1, $x2, $x3, $x4, $x5, $x6)
     };
-    ($x0:expr, $x1:expr, $x2:expr, $x3:expr, $x4:expr, $x5:expr, $x6:expr, $x7:expr) => {
+    ($x0:expr, $x1:expr, $x2:expr, $x3:expr, $x4:expr, $x5:expr, $x6:expr, $x7:expr $(,)?) => {
         and8($x0, $x1, $x2, $x3, $x4, $x5, $x6, $x7)
     };
-    ($x0:expr, $x1:expr, $x2:expr, $x3:expr, $x4:expr, $x5:expr, $x6:expr, $x7:expr, $x8:expr) => {
+    ($x0:expr, $x1:expr, $x2:expr, $x3:expr, $x4:expr,
+     $x5:expr, $x6:expr, $x7:expr, $x8:expr $(,)?) => {
         and9($x0, $x1, $x2, $x3, $x4, $x5, $x6, $x7, $x8)
     };
     ($x0:expr, $x1:expr, $x2:expr, $x3:expr, $x4:expr,
-     $x5:expr, $x6:expr, $x7:expr, $x8:expr, $x9:expr) => {
+     $x5:expr, $x6:expr, $x7:expr, $x8:expr, $x9:expr $(,)?) => {
         and10($x0, $x1, $x2, $x3, $x4, $x5, $x6, $x7, $x8, $x9)
     };
     ($x0:expr, $x1:expr, $x2:expr, $x3:expr, $x4:expr,
-     $x5:expr, $x6:expr, $x7:expr, $x8:expr, $x9:expr, $($y:expr),+) => {
+     $x5:expr, $x6:expr, $x7:expr, $x8:expr, $x9:expr, $($y:expr),+ $(,)?) => {
         and(
             and10($x0, $x1, $x2, $x3, $x4, $x5, $x6, $x7, $x8, $x9),
             and!($($y),+)
@@ -171,37 +172,38 @@ macro_rules! and(
 /// An OR relation of variable arguments.
 #[macro_export]
 macro_rules! or(
-    ($x0:expr) => {$x0};
-    ($x0:expr, $x1:expr) => {
+    ($x0:expr $(,)?) => {$x0};
+    ($x0:expr, $x1:expr $(,)?) => {
         or($x0, $x1)
     };
-    ($x0:expr, $x1:expr, $x2:expr) => {
+    ($x0:expr, $x1:expr, $x2:expr $(,)?) => {
         or3($x0, $x1, $x2)
     };
-    ($x0:expr, $x1:expr, $x2:expr, $x3:expr) => {
+    ($x0:expr, $x1:expr, $x2:expr, $x3:expr $(,)?) => {
         or4($x0, $x1, $x2, $x3)
     };
-    ($x0:expr, $x1:expr, $x2:expr, $x3:expr, $x4:expr) => {
+    ($x0:expr, $x1:expr, $x2:expr, $x3:expr, $x4:expr $(,)?) => {
         or5($x0, $x1, $x2, $x3, $x4)
     };
-    ($x0:expr, $x1:expr, $x2:expr, $x3:expr, $x4:expr, $x5:expr) => {
+    ($x0:expr, $x1:expr, $x2:expr, $x3:expr, $x4:expr, $x5:expr $(,)?) => {
         or6($x0, $x1, $x2, $x3, $x4, $x5)
     };
-    ($x0:expr, $x1:expr, $x2:expr, $x3:expr, $x4:expr, $x5:expr, $x6:expr) => {
+    ($x0:expr, $x1:expr, $x2:expr, $x3:expr, $x4:expr, $x5:expr, $x6:expr $(,)?) => {
         or7($x0, $x1, $x2, $x3, $x4, $x5, $x6)
     };
-    ($x0:expr, $x1:expr, $x2:expr, $x3:expr, $x4:expr, $x5:expr, $x6:expr, $x7:expr) => {
+    ($x0:expr, $x1:expr, $x2:expr, $x3:expr, $x4:expr, $x5:expr, $x6:expr, $x7:expr $(,)?) => {
         or8($x0, $x1, $x2, $x3, $x4, $x5, $x6, $x7)
     };
-    ($x0:expr, $x1:expr, $x2:expr, $x3:expr, $x4:expr, $x5:expr, $x6:expr, $x7:expr, $x8:expr) => {
+    ($x0:expr, $x1:expr, $x2:expr, $x3:expr, $x4:expr,
+     $x5:expr, $x6:expr, $x7:expr, $x8:expr $(,)?) => {
         or9($x0, $x1, $x2, $x3, $x4, $x5, $x6, $x7, $x8)
     };
     ($x0:expr, $x1:expr, $x2:expr, $x3:expr, $x4:expr,
-     $x5:expr, $x6:expr, $x7:expr, $x8:expr, $x9:expr) => {
+     $x5:expr, $x6:expr, $x7:expr, $x8:expr, $x9:expr $(,)?) => {
         or10($x0, $x1, $x2, $x3, $x4, $x5, $x6, $x7, $x8, $x9)
     };
     ($x0:expr, $x1:expr, $x2:expr, $x3:expr, $x4:expr,
-     $x5:expr, $x6:expr, $x7:expr, $x8:expr, $x9:expr, $($y:expr),+) => {
+     $x5:expr, $x6:expr, $x7:expr, $x8:expr, $x9:expr, $($y:expr),+ $(,)?) => {
         or(
             or10($x0, $x1, $x2, $x3, $x4, $x5, $x6, $x7, $x8, $x9),
             or!($($y),+)
@@ -212,36 +214,37 @@ macro_rules! or(
 /// An XOR relation of variable arguments.
 #[macro_export]
 macro_rules! xor(
-    ($x0:expr) => {$x0};
-    ($x0:expr, $x1:expr) => {
+    ($x0:expr $(,)?) => {$x0};
+    ($x0:expr, $x1:expr $(,)?) => {
         xor($x0, $x1)
     };
-    ($x0:expr, $x1:expr, $x2:expr) => {
+    ($x0:expr, $x1:expr, $x2:expr $(,)?) => {
         xor3($x0, $x1, $x2)
     };
-    ($x0:expr, $x1:expr, $x2:expr, $x3:expr) => {
+    ($x0:expr, $x1:expr, $x2:expr, $x3:expr $(,)?) => {
         xor4($x0, $x1, $x2, $x3)
     };
-    ($x0:expr, $x1:expr, $x2:expr, $x3:expr, $x4:expr) => {
+    ($x0:expr, $x1:expr, $x2:expr, $x3:expr, $x4:expr $(,)?) => {
         xor5($x0, $x1, $x2, $x3, $x4)
     };
-    ($x0:expr, $x1:expr, $x2:expr, $x3:expr, $x4:expr, $x5:expr) => {
+    ($x0:expr, $x1:expr, $x2:expr, $x3:expr, $x4:expr, $x5:expr $(,)?) => {
         xor6($x0, $x1, $x2, $x3, $x4, $x5)
     };
-    ($x0:expr, $x1:expr, $x2:expr, $x3:expr, $x4:expr, $x5:expr, $x6:expr) => {
+    ($x0:expr, $x1:expr, $x2:expr, $x3:expr, $x4:expr, $x5:expr, $x6:expr $(,)?) => {
         xor7($x0, $x1, $x2, $x3, $x4, $x5, $x6)
     };
-    ($x0:expr, $x1:expr, $x2:expr, $x3:expr, $x4:expr, $x5:expr, $x6:expr, $x7:expr) => {
+    ($x0:expr, $x1:expr, $x2:expr, $x3:expr, $x4:expr, $x5:expr, $x6:expr, $x7:expr $(,)?) => {
         xor8($x0, $x1, $x2, $x3, $x4, $x5, $x6, $x7)
     };
-    ($x0:expr, $x1:expr, $x2:expr, $x3:expr, $x4:expr, $x5:expr, $x6:expr, $x7:expr, $x8:expr) => {
+    ($x0:expr, $x1:expr, $x2:expr, $x3:expr, $x4:expr,
+     $x5:expr, $x6:expr, $x7:expr, $x8:expr $(,)?) => {
         xor9($x0, $x1, $x2, $x3, $x4, $x5, $x6, $x7, $x8)
     };
     ($x0:expr, $x1:expr, $x2:expr, $x3:expr, $x4:expr,
-     $x5:expr, $x6:expr, $x7:expr, $x8:expr, $x9:expr) => {
+     $x5:expr, $x6:expr, $x7:expr, $x8:expr, $x9:expr $(,)?) => {
         xor10($x0, $x1, $x2, $x3, $x4, $x5, $x6, $x7, $x8, $x9)
     };
-    ($x0:expr, $($y:expr),+) => {
+    ($x0:expr, $($y:expr),+ $(,)?) => {
         or(
             and(not($x0), xor!($($y),+)),
             not(or(not($x0), or!($($y),+)))
@@ -252,36 +255,37 @@ macro_rules! xor(
 /// An IMPLY chain of variable arguments.
 #[macro_export]
 macro_rules! imply(
-    ($x0:expr) => {$x0};
-    ($x0:expr, $x1:expr) => {
+    ($x0:expr $(,)?) => {$x0};
+    ($x0:expr, $x1:expr $(,)?) => {
         imply($x0, $x1)
     };
-    ($x0:expr, $x1:expr, $x2:expr) => {
+    ($x0:expr, $x1:expr, $x2:expr $(,)?) => {
         imply3($x0, $x1, $x2)
     };
-    ($x0:expr, $x1:expr, $x2:expr, $x3:expr) => {
+    ($x0:expr, $x1:expr, $x2:expr, $x3:expr $(,)?) => {
         imply4($x0, $x1, $x2, $x3)
     };
-    ($x0:expr, $x1:expr, $x2:expr, $x3:expr, $x4:expr) => {
+    ($x0:expr, $x1:expr, $x2:expr, $x3:expr, $x4:expr $(,)?) => {
         imply5($x0, $x1, $x2, $x3, $x4)
     };
-    ($x0:expr, $x1:expr, $x2:expr, $x3:expr, $x4:expr, $x5:expr) => {
+    ($x0:expr, $x1:expr, $x2:expr, $x3:expr, $x4:expr, $x5:expr $(,)?) => {
         imply6($x0, $x1, $x2, $x3, $x4, $x5)
     };
-    ($x0:expr, $x1:expr, $x2:expr, $x3:expr, $x4:expr, $x5:expr, $x6:expr) => {
+    ($x0:expr, $x1:expr, $x2:expr, $x3:expr, $x4:expr, $x5:expr, $x6:expr $(,)?) => {
         imply7($x0, $x1, $x2, $x3, $x4, $x5, $x6)
     };
-    ($x0:expr, $x1:expr, $x2:expr, $x3:expr, $x4:expr, $x5:expr, $x6:expr, $x7:expr) => {
+    ($x0:expr, $x1:expr, $x2:expr, $x3:expr, $x4:expr, $x5:expr, $x6:expr, $x7:expr $(,)?) => {
         imply8($x0, $x1, $x2, $x3, $x4, $x5, $x6, $x7)
     };
-    ($x0:expr, $x1:expr, $x2:expr, $x3:expr, $x4:expr, $x5:expr, $x6:expr, $x7:expr, $x8:expr) => {
+    ($x0:expr, $x1:expr, $x2:expr, $x3:expr, $x4:expr,
+     $x5:expr, $x6:expr, $x7:expr, $x8:expr $(,)?) => {
         imply9($x0, $x1, $x2, $x3, $x4, $x5, $x6, $x7, $x8)
     };
     ($x0:expr, $x1:expr, $x2:expr, $x3:expr, $x4:expr,
-     $x5:expr, $x6:expr, $x7:expr, $x8:expr, $x9:expr) => {
+     $x5:expr, $x6:expr, $x7:expr, $x8:expr, $x9:expr $(,)?) => {
         imply10($x0, $x1, $x2, $x3, $x4, $x5, $x6, $x7, $x8, $x9)
     };
-    ($x0:expr, $x1:expr, $($y:expr),+) => {
+    ($x0:expr, $x1:expr, $($y:expr),+ $(,)?) => {
         and(imply($x0, $x1), imply!($x1, $($y),+))
     };
 );
@@ -291,30 +295,30 @@ macro_rules! imply(
 /// Expands automatically to Path Semantical Logic when using tuples as arguments.
 #[macro_export]
 macro_rules! count(
-    (&mut |$x0:ident| $e:expr) => {
+    (&mut |$x0:ident $(,)?| $e:expr) => {
         count1(&mut |$x0| $e)
     };
-    (&mut |$x0:ident, $x1:ident| $e:expr) => {
+    (&mut |$x0:ident, $x1:ident $(,)?| $e:expr) => {
         count2(&mut |$x0, $x1| $e)
     };
-    (&mut |$x0:ident, $x1:ident, $x2:ident| $e:expr) => {
+    (&mut |$x0:ident, $x1:ident, $x2:ident $(,)?| $e:expr) => {
         count3(&mut |$x0, $x1, $x2| $e)
     };
-    (&mut |$x0:ident, $x1:ident, $x2:ident, $x3:ident| $e:expr) => {
+    (&mut |$x0:ident, $x1:ident, $x2:ident, $x3:ident $(,)?| $e:expr) => {
         count4(&mut |$x0, $x1, $x2, $x3| $e)
     };
-    (&mut |$x0:ident, $x1:ident, $x2:ident, $x3:ident, $x4:ident| $e:expr) => {
+    (&mut |$x0:ident, $x1:ident, $x2:ident, $x3:ident, $x4:ident $(,)?| $e:expr) => {
         count5(&mut |$x0, $x1, $x2, $x3, $x4| $e)
     };
-    (&mut |$x0:ident, $x1:ident, $x2:ident, $x3:ident, $x4:ident, $x5:ident| $e:expr) => {
+    (&mut |$x0:ident, $x1:ident, $x2:ident, $x3:ident, $x4:ident, $x5:ident $(,)?| $e:expr) => {
         count6(&mut |$x0, $x1, $x2, $x3, $x4, $x5| $e)
     };
     (&mut |$x0:ident, $x1:ident, $x2:ident, $x3:ident, $x4:ident,
-           $x5:ident, $x6:ident| $e:expr) => {
+           $x5:ident, $x6:ident $(,)?| $e:expr) => {
         count7(&mut |$x0, $x1, $x2, $x3, $x4, $x5, $x6| $e)
     };
     (&mut |$x0:ident, $x1:ident, $x2:ident, $x3:ident,
-           $x4:ident, $x5:ident, $x6:ident, $x7:ident| $e:expr) => {
+           $x4:ident, $x5:ident, $x6:ident, $x7:ident $(,)?| $e:expr) => {
         count8(&mut |$x0, $x1, $x2, $x3, $x4, $x5, $x6, $x7| $e)
     };
     (&mut |$x0:ident, $x1:ident, $x2:ident, $x3:ident, $x4:ident,
@@ -322,16 +326,16 @@ macro_rules! count(
         count9(&mut |$x0, $x1, $x2, $x3, $x4, $x5, $x6, $x7, $x8| $e)
     };
     (&mut |$x0:ident, $x1:ident, $x2:ident, $x3:ident, $x4:ident,
-           $x5:ident, $x6:ident, $x7:ident, $x8:ident, $x9:ident| $e:expr) => {
+           $x5:ident, $x6:ident, $x7:ident, $x8:ident, $x9:ident $(,)?| $e:expr) => {
         count10(&mut |$x0, $x1, $x2, $x3, $x4, $x5, $x6, $x7, $x8, $x9| $e)
     };
-    (&mut |$($x:ident),+| $e:expr) => {
+    (&mut |$($x:ident),+ $(,)?| $e:expr) => {
         countn(tup_count!($($x),+), &mut |x| {
             tup_set!(x, ($($x),+));
             $e
         })
     };
-    (&mut |($($x:ident),+), ($($y:ident),+)| $e:expr) => {
+    (&mut |($($x:ident),+ $(,)?), ($($y:ident),+ $(,)?)| $e:expr) => {
         path1_count!(&mut |($($x),+), ($($y),+)| $e)
     };
 );
@@ -359,41 +363,41 @@ macro_rules! tup_set(
 /// Path Semantical Logic: Counts the number of solutions of a variable argument boolean function.
 #[macro_export]
 macro_rules! path1_count(
-    (&mut |$x0:ident| $e:expr) => {
+    (&mut |$x0:ident $(,)?| $e:expr) => {
         path1_count1(&mut |$x0| $e)
     };
-    (&mut |$x0:ident, $x1:ident| $e:expr) => {
+    (&mut |$x0:ident, $x1:ident $(,)?| $e:expr) => {
         path1_count2(&mut |$x0, $x1| $e)
     };
-    (&mut |($x0:ident, $x1:ident), $x2:ident| $e:expr) => {
+    (&mut |($x0:ident, $x1:ident $(,)?), $x2:ident $(,)?| $e:expr) => {
         path1_count3(&mut |($x0, $x1), $x2| $e)
     };
-    (&mut |($x0:ident, $x1:ident), ($x2:ident, $x3:ident)| $e:expr) => {
+    (&mut |($x0:ident, $x1:ident $(,)?), ($x2:ident, $x3:ident $(,)?)| $e:expr) => {
         path1_count4(&mut |($x0, $x1), ($x2, $x3)| $e)
     };
-    (&mut |($x0:ident, $x1:ident, $x2:ident), ($x3:ident, $x4:ident)| $e:expr) => {
+    (&mut |($x0:ident, $x1:ident, $x2:ident $(,)?), ($x3:ident, $x4:ident $(,)?)| $e:expr) => {
         path1_count5(&mut |($x0, $x1, $x2), ($x3, $x4)| $e)
     };
-    (&mut |($x0:ident, $x1:ident, $x2:ident), ($x3:ident, $x4:ident, $x5:ident)| $e:expr) => {
+    (&mut |($x0:ident, $x1:ident, $x2:ident $(,)?), ($x3:ident, $x4:ident, $x5:ident $(,)?)| $e:expr) => {
         path1_count6(&mut |($x0, $x1, $x2), ($x3, $x4, $x5)| $e)
     };
-    (&mut |($x0:ident, $x1:ident, $x2:ident, $x3:ident),
-           ($x4:ident, $x5:ident, $x6:ident)| $e:expr) => {
+    (&mut |($x0:ident, $x1:ident, $x2:ident, $x3:ident $(,)?),
+           ($x4:ident, $x5:ident, $x6:ident $(,)?)| $e:expr) => {
         path1_count7(&mut |($x0, $x1, $x2, $x3), ($x4, $x5, $x6)| $e)
     };
-    (&mut |($x0:ident, $x1:ident, $x2:ident, $x3:ident),
-           ($x4:ident, $x5:ident, $x6:ident, $x7:ident)| $e:expr) => {
+    (&mut |($x0:ident, $x1:ident, $x2:ident, $x3:ident $(,)?),
+           ($x4:ident, $x5:ident, $x6:ident, $x7:ident $(,)?)| $e:expr) => {
         path1_count8(&mut |($x0, $x1, $x2, $x3), ($x4, $x5, $x6, $x7)| $e)
     };
-    (&mut |($x0:ident, $x1:ident, $x2:ident, $x3:ident, $x4:ident),
-           ($x5:ident, $x6:ident, $x7:ident, $x8:ident)| $e:expr) => {
+    (&mut |($x0:ident, $x1:ident, $x2:ident, $x3:ident, $x4:ident $(,)?),
+           ($x5:ident, $x6:ident, $x7:ident, $x8:ident $(,)?)| $e:expr) => {
         path1_count9(&mut |($x0, $x1, $x2, $x3, $x4), ($x5, $x6, $x7, $x8)| $e)
     };
-    (&mut |($x0:ident, $x1:ident, $x2:ident, $x3:ident, $x4:ident),
-           ($x5:ident, $x6:ident, $x7:ident, $x8:ident, $x9:ident)| $e:expr) => {
+    (&mut |($x0:ident, $x1:ident, $x2:ident, $x3:ident, $x4:ident $(,)?),
+           ($x5:ident, $x6:ident, $x7:ident, $x8:ident, $x9:ident $(,)?)| $e:expr) => {
         path1_count10(&mut |($x0, $x1, $x2, $x3, $x4), ($x5, $x6, $x7, $x8, $x9)| $e)
     };
-    (&mut |($($x:ident),+), ($($y:ident),+)| $e:expr) => {
+    (&mut |($($x:ident),+ $(,)?), ($($y:ident),+ $(,)?)| $e:expr) => {
         path1_countnm(tup_count!($($x),+), tup_count!($($y),+), &mut |f, x| {
             tup_set!(f, ($($x),+));
             tup_set!(x, ($($y),+));
@@ -407,47 +411,47 @@ macro_rules! path1_count(
 /// Expands automatically to Path Semantical Logic when using tuples as arguments.
 #[macro_export]
 macro_rules! prove(
-    (&mut |$x0:ident| $e:expr) => {
+    (&mut |$x0:ident $(,)?| $e:expr) => {
         prove1(&mut |$x0| $e)
     };
-    (&mut |$x0:ident, $x1:ident| $e:expr) => {
+    (&mut |$x0:ident, $x1:ident $(,)?| $e:expr) => {
         prove2(&mut |$x0, $x1| $e)
     };
-    (&mut |$x0:ident, $x1:ident, $x2:ident| $e:expr) => {
+    (&mut |$x0:ident, $x1:ident, $x2:ident $(,)?| $e:expr) => {
         prove3(&mut |$x0, $x1, $x2| $e)
     };
-    (&mut |$x0:ident, $x1:ident, $x2:ident, $x3:ident| $e:expr) => {
+    (&mut |$x0:ident, $x1:ident, $x2:ident, $x3:ident $(,)?| $e:expr) => {
         prove4(&mut |$x0, $x1, $x2, $x3| $e)
     };
-    (&mut |$x0:ident, $x1:ident, $x2:ident, $x3:ident, $x4:ident| $e:expr) => {
+    (&mut |$x0:ident, $x1:ident, $x2:ident, $x3:ident, $x4:ident $(,)?| $e:expr) => {
         prove5(&mut |$x0, $x1, $x2, $x3, $x4| $e)
     };
-    (&mut |$x0:ident, $x1:ident, $x2:ident, $x3:ident, $x4:ident, $x5:ident| $e:expr) => {
+    (&mut |$x0:ident, $x1:ident, $x2:ident, $x3:ident, $x4:ident, $x5:ident $(,)?| $e:expr) => {
         prove6(&mut |$x0, $x1, $x2, $x3, $x4, $x5| $e)
     };
     (&mut |$x0:ident, $x1:ident, $x2:ident, $x3:ident, $x4:ident,
-           $x5:ident, $x6:ident| $e:expr) => {
+           $x5:ident, $x6:ident $(,)?| $e:expr) => {
         prove7(&mut |$x0, $x1, $x2, $x3, $x4, $x5, $x6| $e)
     };
     (&mut |$x0:ident, $x1:ident, $x2:ident, $x3:ident,
-           $x4:ident, $x5:ident, $x6:ident, $x7:ident| $e:expr) => {
+           $x4:ident, $x5:ident, $x6:ident, $x7:ident $(,)?| $e:expr) => {
         prove8(&mut |$x0, $x1, $x2, $x3, $x4, $x5, $x6, $x7| $e)
     };
     (&mut |$x0:ident, $x1:ident, $x2:ident, $x3:ident, $x4:ident,
-           $x5:ident, $x6:ident, $x7:ident, $x8:ident| $e:expr) => {
+           $x5:ident, $x6:ident, $x7:ident, $x8:ident $(,)?| $e:expr) => {
         prove9(&mut |$x0, $x1, $x2, $x3, $x4, $x5, $x6, $x7, $x8| $e)
     };
     (&mut |$x0:ident, $x1:ident, $x2:ident, $x3:ident, $x4:ident,
-           $x5:ident, $x6:ident, $x7:ident, $x8:ident, $x9:ident| $e:expr) => {
+           $x5:ident, $x6:ident, $x7:ident, $x8:ident, $x9:ident $(,)?| $e:expr) => {
         prove10(&mut |$x0, $x1, $x2, $x3, $x4, $x5, $x6, $x7, $x8, $x9| $e)
     };
-    (&mut |$($x:ident),+| $e:expr) => {
+    (&mut |$($x:ident),+ $(,)?| $e:expr) => {
         proven(tup_count!($($x),+), &mut |x| {
             tup_set!(x, ($($x),+));
             $e
         })
     };
-    (&mut |($($x:ident),+), ($($y:ident),+)| $e:expr) => {
+    (&mut |($($x:ident),+ $(,)?), ($($y:ident),+ $(,)?)| $e:expr) => {
         path1_prove!(&mut |($($x),+), ($($y),+)| $e)
     };
 );
@@ -455,41 +459,41 @@ macro_rules! prove(
 /// Path Semantical Logic: Returns `true` if proposition is correct, `false` otherwise.
 #[macro_export]
 macro_rules! path1_prove(
-    (&mut |$x0:ident| $e:expr) => {
+    (&mut |$x0:ident $(,)?| $e:expr) => {
         path1_prove1(&mut |$x0| $e)
     };
-    (&mut |$x0:ident, $x1:ident| $e:expr) => {
+    (&mut |$x0:ident, $x1:ident $(,)?| $e:expr) => {
         path1_prove2(&mut |$x0, $x1| $e)
     };
-    (&mut |($x0:ident, $x1:ident), $x2:ident| $e:expr) => {
+    (&mut |($x0:ident, $x1:ident $(,)?), $x2:ident $(,)?| $e:expr) => {
         path1_prove3(&mut |($x0, $x1), $x2| $e)
     };
-    (&mut |($x0:ident, $x1:ident), ($x2:ident, $x3:ident)| $e:expr) => {
+    (&mut |($x0:ident, $x1:ident $(,)?), ($x2:ident, $x3:ident $(,)?)| $e:expr) => {
         path1_prove4(&mut |($x0, $x1), ($x2, $x3)| $e)
     };
-    (&mut |($x0:ident, $x1:ident, $x2:ident), ($x3:ident, $x4:ident)| $e:expr) => {
+    (&mut |($x0:ident, $x1:ident, $x2:ident $(,)?), ($x3:ident, $x4:ident $(,)?)| $e:expr) => {
         path1_prove5(&mut |($x0, $x1, $x2), ($x3, $x4)| $e)
     };
-    (&mut |($x0:ident, $x1:ident, $x2:ident), ($x3:ident, $x4:ident, $x5:ident)| $e:expr) => {
+    (&mut |($x0:ident, $x1:ident, $x2:ident $(,)?), ($x3:ident, $x4:ident, $x5:ident $(,)?)| $e:expr) => {
         path1_prove6(&mut |($x0, $x1, $x2), ($x3, $x4, $x5)| $e)
     };
-    (&mut |($x0:ident, $x1:ident, $x2:ident, $x3:ident),
-           ($x4:ident, $x5:ident, $x6:ident)| $e:expr) => {
+    (&mut |($x0:ident, $x1:ident, $x2:ident, $x3:ident $(,)?),
+           ($x4:ident, $x5:ident, $x6:ident $(,)?)| $e:expr) => {
         path1_prove7(&mut |($x0, $x1, $x2, $x3), ($x4, $x5, $x6)| $e)
     };
-    (&mut |($x0:ident, $x1:ident, $x2:ident, $x3:ident),
-           ($x4:ident, $x5:ident, $x6:ident, $x7:ident)| $e:expr) => {
+    (&mut |($x0:ident, $x1:ident, $x2:ident, $x3:ident $(,)?),
+           ($x4:ident, $x5:ident, $x6:ident, $x7:ident $(,)?)| $e:expr) => {
         path1_prove8(&mut |($x0, $x1, $x2, $x3), ($x4, $x5, $x6, $x7)| $e)
     };
-    (&mut |($x0:ident, $x1:ident, $x2:ident, $x3:ident, $x4:ident),
-           ($x5:ident, $x6:ident, $x7:ident, $x8:ident)| $e:expr) => {
+    (&mut |($x0:ident, $x1:ident, $x2:ident, $x3:ident, $x4:ident $(,)?),
+           ($x5:ident, $x6:ident, $x7:ident, $x8:ident $(,)?)| $e:expr) => {
         path1_prove9(&mut |($x0, $x1, $x2, $x3, $x4), ($x5, $x6, $x7, $x8)| $e)
     };
-    (&mut |($x0:ident, $x1:ident, $x2:ident, $x3:ident, $x4:ident),
-           ($x5:ident, $x6:ident, $x7:ident, $x8:ident, $x9:ident)| $e:expr) => {
+    (&mut |($x0:ident, $x1:ident, $x2:ident, $x3:ident, $x4:ident $(,)?),
+           ($x5:ident, $x6:ident, $x7:ident, $x8:ident, $x9:ident $(,)?)| $e:expr) => {
         path1_prove10(&mut |($x0, $x1, $x2, $x3, $x4), ($x5, $x6, $x7, $x8, $x9)| $e)
     };
-    (&mut |($($x:ident),+), ($($y:ident),+)| $e:expr) => {
+    (&mut |($($x:ident),+ $(,)?), ($($y:ident),+ $(,)?)| $e:expr) => {
         path1_provenm(tup_count!($($x),+), tup_count!($($y),+), &mut |f, x| {
             tup_set!(f, ($($x),+));
             tup_set!(x, ($($y),+));
