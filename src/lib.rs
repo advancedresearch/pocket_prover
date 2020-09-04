@@ -82,7 +82,7 @@
 //! This library has currently only support for level 1 and 0.
 //! These functions are prefixed with `path1_`.
 //!
-//! The macros `count!` and `prove!` with automatically expand
+//! The macros `count!` and `prove!` will automatically expand
 //! to `path1_count!` and `path1_prove!`.
 //!
 //! Each function takes two arguments, consisting of tuples of propositions, e.g. `(f, g), (x, y)`.
