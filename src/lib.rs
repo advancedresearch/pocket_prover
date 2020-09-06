@@ -130,7 +130,7 @@
 /// An AND relation of variable arguments.
 #[macro_export]
 macro_rules! and(
-    ($x0:expr) => {$x0};
+    ($x0:expr $(,)?) => {$x0};
     ($x0:expr, $x1:expr $(,)?) => {
         and($x0, $x1)
     };
@@ -500,6 +500,16 @@ macro_rules! path1_prove(
             $e
         })
     };
+);
+
+/// Path Semantical Logic: A contractible "family of types".
+///
+/// All propositions are either `true` or all propositions are `false`.
+#[macro_export]
+macro_rules! contr(
+    ($($x:expr),*) => {
+        xor(and!($($x),*), and!($(not($x)),*))
+    }
 );
 
 /// The False proposition.
