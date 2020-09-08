@@ -83,7 +83,7 @@ macro_rules! println_extract(
             })
         });
     };
-    (&mut |($($t1:ident),+ $(,)?), ($($t0:ident),+ $(,)?)| $th:expr ; $($x:ident => $ch:expr),*) => {
+    (&mut |($($t1:ident),+ $(,)?), ($($t0:ident),+ $(,)?)| $th:expr ; $($x:ident => $ch:expr),* $(,)?) => {
         println_bits!(|$($x),*| {
             !prove!(&mut |($($t1),+), ($($t0),+)| {
                 imply(
