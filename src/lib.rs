@@ -127,6 +127,8 @@
 //! }
 //! ```
 
+pub mod extract;
+
 /// An AND relation of variable arguments.
 #[macro_export]
 macro_rules! and(
