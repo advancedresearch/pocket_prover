@@ -126,6 +126,26 @@
 //!     }));
 //! }
 //! ```
+//!
+//! ### Path Semantical Quality
+//!
+//! Pocket-Prover has a model of [Path Semantical Quality](https://github.com/advancedresearch/path_semantics/blob/master/papers-wip2/path-semantical-quality.pdf)
+//! that resembles quantum logic.
+//!
+//! To write `x ~~ y` you use `q(x, y)` or `qual(x, y)`.
+//!
+//! `q(x, x)` is the same as `qubit(x)`.
+//! `q(x, y)` where `x` and `y` are symbolic distinct is the same as `T`.
+//!
+//! A qubit is a kind of "superposition".
+//! One can also think about it as introducing a new argument `qubit(x)` that depends on `x`.
+//!
+//! Since qubits can collide with other propositions,
+//! one must repeat measurements e.g. using `measure` to get classical states.
+//! However, sometimes one might wish to amplify quantum states, using `amplify` or `amp`.
+//!
+//! To use quality with path semantics, one should use `ps_core`.
+//! Path Semantical Logic is designed for equality, not quality.
 
 pub mod extract;
 
@@ -549,9 +569,9 @@ impl Observable for bool {
     fn min_energy(self, other: bool) -> bool {self && other}
 }
 
-impl Observable for u32 {
-    fn max_energy() -> u32 {std::u32::MAX}
-    fn min_energy(self, other: u32) -> u32 {self.min(other)}
+impl Observable for u64 {
+    fn max_energy() -> u64 {std::u64::MAX}
+    fn min_energy(self, other: u64) -> u64 {self.min(other)}
 }
 
 /// Prepares a qubit using a proposition as seed.
@@ -599,70 +619,70 @@ fn call(mut fun: impl FnMut() -> u64) -> u64 {
 }
 
 /// Counts the number of solutions of a 1-argument boolean function.
-pub fn count1<F: FnMut(u64) -> u64>(f: &mut F) -> u32 {
-    call(|| ((f)(P0) & 0x3)).count_ones()
+pub fn count1<F: FnMut(u64) -> u64>(f: &mut F) -> u64 {
+    call(|| ((f)(P0) & 0x3)).count_ones() as u64
 }
 /// Counts the number of solutions of a 2-argument boolean function.
-pub fn count2<F: FnMut(u64, u64) -> u64>(f: &mut F) -> u32 {
-    call(|| ((f)(P0, P1) & 0xf)).count_ones()
+pub fn count2<F: FnMut(u64, u64) -> u64>(f: &mut F) -> u64 {
+    call(|| ((f)(P0, P1) & 0xf)).count_ones() as u64
 }
 /// Counts the number of solutions of a 3-argument boolean function.
-pub fn count3<F: FnMut(u64, u64, u64) -> u64>(f: &mut F) -> u32 {
-    call(|| ((f)(P0, P1, P2) & 0xff)).count_ones()
+pub fn count3<F: FnMut(u64, u64, u64) -> u64>(f: &mut F) -> u64 {
+    call(|| ((f)(P0, P1, P2) & 0xff)).count_ones() as u64
 }
 /// Counts the number of solutions of a 4-argument boolean function.
-pub fn count4<F: FnMut(u64, u64, u64, u64) -> u64>(f: &mut F) -> u32 {
-    call(|| ((f)(P0, P1, P2, P3) & 0xffff)).count_ones()
+pub fn count4<F: FnMut(u64, u64, u64, u64) -> u64>(f: &mut F) -> u64 {
+    call(|| ((f)(P0, P1, P2, P3) & 0xffff)).count_ones() as u64
 }
 /// Counts the number of solutions of a 5-argument boolean function.
-pub fn count5<F: FnMut(u64, u64, u64, u64, u64) -> u64>(f: &mut F) -> u32 {
-    call(|| ((f)(P0, P1, P2, P3, P4) & 0xffff_ffff)).count_ones()
+pub fn count5<F: FnMut(u64, u64, u64, u64, u64) -> u64>(f: &mut F) -> u64 {
+    call(|| ((f)(P0, P1, P2, P3, P4) & 0xffff_ffff)).count_ones() as u64
 }
 /// Counts the number of solutions of a 6-argument boolean function.
-pub fn count6<F: FnMut(u64, u64, u64, u64, u64, u64) -> u64>(f: &mut F) -> u32 {
-    call(|| (f)(P0, P1, P2, P3, P4, P5)).count_ones()
+pub fn count6<F: FnMut(u64, u64, u64, u64, u64, u64) -> u64>(f: &mut F) -> u64 {
+    call(|| (f)(P0, P1, P2, P3, P4, P5)).count_ones() as u64
 }
 /// Counts the number of solutions of a 7-argument boolean function.
-pub fn count7<F: FnMut(u64, u64, u64, u64, u64, u64, u64) -> u64>(f: &mut F) -> u32 {
-    call(|| (f)(P0, P1, P2, P3, P4, P5, F)).count_ones() +
-    call(|| (f)(P0, P1, P2, P3, P4, P5, T)).count_ones()
+pub fn count7<F: FnMut(u64, u64, u64, u64, u64, u64, u64) -> u64>(f: &mut F) -> u64 {
+    call(|| (f)(P0, P1, P2, P3, P4, P5, F)).count_ones() as u64 +
+    call(|| (f)(P0, P1, P2, P3, P4, P5, T)).count_ones() as u64
 }
 /// Counts the number of solutions of an 8-argument boolean function.
-pub fn count8<F: FnMut(u64, u64, u64, u64, u64, u64, u64, u64) -> u64>(f: &mut F) -> u32 {
-    call(|| (f)(P0, P1, P2, P3, P4, P5, F, F)).count_ones() +
-    call(|| (f)(P0, P1, P2, P3, P4, P5, F, T)).count_ones() +
-    call(|| (f)(P0, P1, P2, P3, P4, P5, T, F)).count_ones() +
-    call(|| (f)(P0, P1, P2, P3, P4, P5, T, T)).count_ones()
+pub fn count8<F: FnMut(u64, u64, u64, u64, u64, u64, u64, u64) -> u64>(f: &mut F) -> u64 {
+    call(|| (f)(P0, P1, P2, P3, P4, P5, F, F)).count_ones() as u64 +
+    call(|| (f)(P0, P1, P2, P3, P4, P5, F, T)).count_ones() as u64 +
+    call(|| (f)(P0, P1, P2, P3, P4, P5, T, F)).count_ones() as u64 +
+    call(|| (f)(P0, P1, P2, P3, P4, P5, T, T)).count_ones() as u64
 }
 /// Counts the number of solutions of a 9-argument boolean function.
-pub fn count9<F: FnMut(u64, u64, u64, u64, u64, u64, u64, u64, u64) -> u64>(f: &mut F) -> u32 {
-    call(|| (f)(P0, P1, P2, P3, P4, P5, F, F, F)).count_ones() +
-    call(|| (f)(P0, P1, P2, P3, P4, P5, F, F, T)).count_ones() +
-    call(|| (f)(P0, P1, P2, P3, P4, P5, F, T, F)).count_ones() +
-    call(|| (f)(P0, P1, P2, P3, P4, P5, F, T, T)).count_ones() +
-    call(|| (f)(P0, P1, P2, P3, P4, P5, T, F, F)).count_ones() +
-    call(|| (f)(P0, P1, P2, P3, P4, P5, T, F, T)).count_ones() +
-    call(|| (f)(P0, P1, P2, P3, P4, P5, T, T, F)).count_ones() +
-    call(|| (f)(P0, P1, P2, P3, P4, P5, T, T, T)).count_ones()
+pub fn count9<F: FnMut(u64, u64, u64, u64, u64, u64, u64, u64, u64) -> u64>(f: &mut F) -> u64 {
+    call(|| (f)(P0, P1, P2, P3, P4, P5, F, F, F)).count_ones() as u64 +
+    call(|| (f)(P0, P1, P2, P3, P4, P5, F, F, T)).count_ones() as u64 +
+    call(|| (f)(P0, P1, P2, P3, P4, P5, F, T, F)).count_ones() as u64 +
+    call(|| (f)(P0, P1, P2, P3, P4, P5, F, T, T)).count_ones() as u64 +
+    call(|| (f)(P0, P1, P2, P3, P4, P5, T, F, F)).count_ones() as u64 +
+    call(|| (f)(P0, P1, P2, P3, P4, P5, T, F, T)).count_ones() as u64 +
+    call(|| (f)(P0, P1, P2, P3, P4, P5, T, T, F)).count_ones() as u64 +
+    call(|| (f)(P0, P1, P2, P3, P4, P5, T, T, T)).count_ones() as u64
 }
 /// Counts the number of solutions of a 10-argument boolean function.
-pub fn count10<F: FnMut(u64, u64, u64, u64, u64, u64, u64, u64, u64, u64) -> u64>(f: &mut F) -> u32 {
-    call(|| (f)(P0, P1, P2, P3, P4, P5, F, F, F, F)).count_ones() +
-    call(|| (f)(P0, P1, P2, P3, P4, P5, F, F, F, T)).count_ones() +
-    call(|| (f)(P0, P1, P2, P3, P4, P5, F, F, T, F)).count_ones() +
-    call(|| (f)(P0, P1, P2, P3, P4, P5, F, F, T, T)).count_ones() +
-    call(|| (f)(P0, P1, P2, P3, P4, P5, F, T, F, F)).count_ones() +
-    call(|| (f)(P0, P1, P2, P3, P4, P5, F, T, F, T)).count_ones() +
-    call(|| (f)(P0, P1, P2, P3, P4, P5, F, T, T, F)).count_ones() +
-    call(|| (f)(P0, P1, P2, P3, P4, P5, F, T, T, T)).count_ones() +
-    call(|| (f)(P0, P1, P2, P3, P4, P5, T, F, F, F)).count_ones() +
-    call(|| (f)(P0, P1, P2, P3, P4, P5, T, F, F, T)).count_ones() +
-    call(|| (f)(P0, P1, P2, P3, P4, P5, T, F, T, F)).count_ones() +
-    call(|| (f)(P0, P1, P2, P3, P4, P5, T, F, T, T)).count_ones() +
-    call(|| (f)(P0, P1, P2, P3, P4, P5, T, T, F, F)).count_ones() +
-    call(|| (f)(P0, P1, P2, P3, P4, P5, T, T, F, T)).count_ones() +
-    call(|| (f)(P0, P1, P2, P3, P4, P5, T, T, T, F)).count_ones() +
-    call(|| (f)(P0, P1, P2, P3, P4, P5, T, T, T, T)).count_ones()
+pub fn count10<F: FnMut(u64, u64, u64, u64, u64, u64, u64, u64, u64, u64) -> u64>(f: &mut F) -> u64 {
+    call(|| (f)(P0, P1, P2, P3, P4, P5, F, F, F, F)).count_ones() as u64 +
+    call(|| (f)(P0, P1, P2, P3, P4, P5, F, F, F, T)).count_ones() as u64 +
+    call(|| (f)(P0, P1, P2, P3, P4, P5, F, F, T, F)).count_ones() as u64 +
+    call(|| (f)(P0, P1, P2, P3, P4, P5, F, F, T, T)).count_ones() as u64 +
+    call(|| (f)(P0, P1, P2, P3, P4, P5, F, T, F, F)).count_ones() as u64 +
+    call(|| (f)(P0, P1, P2, P3, P4, P5, F, T, F, T)).count_ones() as u64 +
+    call(|| (f)(P0, P1, P2, P3, P4, P5, F, T, T, F)).count_ones() as u64 +
+    call(|| (f)(P0, P1, P2, P3, P4, P5, F, T, T, T)).count_ones() as u64 +
+    call(|| (f)(P0, P1, P2, P3, P4, P5, T, F, F, F)).count_ones() as u64 +
+    call(|| (f)(P0, P1, P2, P3, P4, P5, T, F, F, T)).count_ones() as u64 +
+    call(|| (f)(P0, P1, P2, P3, P4, P5, T, F, T, F)).count_ones() as u64 +
+    call(|| (f)(P0, P1, P2, P3, P4, P5, T, F, T, T)).count_ones() as u64 +
+    call(|| (f)(P0, P1, P2, P3, P4, P5, T, T, F, F)).count_ones() as u64 +
+    call(|| (f)(P0, P1, P2, P3, P4, P5, T, T, F, T)).count_ones() as u64 +
+    call(|| (f)(P0, P1, P2, P3, P4, P5, T, T, T, F)).count_ones() as u64 +
+    call(|| (f)(P0, P1, P2, P3, P4, P5, T, T, T, T)).count_ones() as u64
 }
 /// Counts the number of solutions of an n-argument boolean function.
 pub fn countn(n: usize, fun: &mut dyn FnMut(&[u64]) -> u64) -> u64 {
@@ -723,83 +743,83 @@ pub fn countn(n: usize, fun: &mut dyn FnMut(&[u64]) -> u64) -> u64 {
 /// For more information, see the section "Path Semantical Logic" at the top level documentation.
 ///
 /// For 1-argument functions this is the same as normal counting of solutions.
-pub fn path1_count1<F: FnMut(u64) -> u64>(f: &mut F) -> u32 {count1(f)}
+pub fn path1_count1<F: FnMut(u64) -> u64>(f: &mut F) -> u64 {count1(f)}
 /// Path Semantical Logic: Counts the number of solutions of a 2-argument boolean function,
 ///
 /// For more information, see the section "Path Semantical Logic" at the top level documentation.
 ///
 /// For 2-argument functions this is the same as normal counting of solutions.
-pub fn path1_count2<F: FnMut(u64, u64) -> u64>(f: &mut F) -> u32 {count2(f)}
+pub fn path1_count2<F: FnMut(u64, u64) -> u64>(f: &mut F) -> u64 {count2(f)}
 /// Path Semantical Logic: Counts the number of solutions of a 3-argument boolean function,
 ///
 /// For more information, see the section "Path Semantical Logic" at the top level documentation.
 ///
 /// For 3-argument functions this is the same as normal counting of solutions.
-pub fn path1_count3<F: FnMut((u64, u64), u64) -> u64>(f: &mut F) -> u32 {
-    ((f)((0b00001111,
+pub fn path1_count3<F: FnMut((u64, u64), u64) -> u64>(f: &mut F) -> u64 {
+    call(|| ((f)((0b00001111,
           0b00110011),
           0b01010101,
-    ) & 0b11111111).count_ones()
+    ) & 0b11111111)).count_ones() as u64
 }
 /// Path Semantical Logic: Counts the number of solutions of a 4-argument boolean function,
 ///
 /// For more information, see the section "Path Semantical Logic" at the top level documentation.
-pub fn path1_count4<F: FnMut((u64, u64), (u64, u64)) -> u64>(f: &mut F) -> u32 {
-    ((f)((0b00000011111111,
+pub fn path1_count4<F: FnMut((u64, u64), (u64, u64)) -> u64>(f: &mut F) -> u64 {
+    call(|| ((f)((0b00000011111111,
           0b00111100001111),
          (0b01001100110011,
           0b01010101010101)
-     ) & 0b11111111111111).count_ones()
+     ) & 0b11111111111111)).count_ones() as u64
 }
 /// Path Semantical Logic: Counts the number of solutions of a 5-argument boolean function,
 ///
 /// For more information, see the section "Path Semantical Logic" at the top level documentation.
-pub fn path1_count5<F: FnMut((u64, u64, u64), (u64, u64)) -> u64>(f: &mut F) -> u32 {
-    ((f)((0b000000000011111111111111,
+pub fn path1_count5<F: FnMut((u64, u64, u64), (u64, u64)) -> u64>(f: &mut F) -> u64 {
+    call(|| ((f)((0b000000000011111111111111,
           0b000011111100000011111111,
           0b001100111100111100001111),
          (0b010101001101001100110011,
           0b010101010101010101010101))
-        & 0b11111_11111_11111_11111_1111).count_ones()
+        & 0b11111_11111_11111_11111_1111)).count_ones() as u64
 }
 /// Path Semantical Logic: Counts the number of solutions of a 6-argument boolean function,
 ///
 /// For more information, see the section "Path Semantical Logic" at the top level documentation.
-pub fn path1_count6<F: FnMut((u64, u64, u64), (u64, u64, u64)) -> u64>(f: &mut F) -> u32 {
-    ((f)((0b0000000000000011111111111111111111111111,
+pub fn path1_count6<F: FnMut((u64, u64, u64), (u64, u64, u64)) -> u64>(f: &mut F) -> u64 {
+    call(|| ((f)((0b0000000000000011111111111111111111111111,
           0b0000111111111100000000001111111111111111,
           0b0011001111111100111111110000000011111111),
          (0b0101010000111101000011110000111100001111,
           0b0101010011001101001100110011001100110011,
           0b0101010101010101010101010101010101010101))
-         & 0b11111_11111_11111_11111_11111_11111_11111_11111).count_ones()
+         & 0b11111_11111_11111_11111_11111_11111_11111_11111)).count_ones() as u64
 }
 /// Path Semantical Logic: Counts the number of solutions of a 7-argument boolean function,
 ///
 /// For more information, see the section "Path Semantical Logic" at the top level documentation.
-pub fn path1_count7<F: FnMut((u64, u64, u64, u64), (u64, u64, u64)) -> u64>(f: &mut F) -> u32 {
-    ((f)((0b00000000000000000000001111111111111111111111111111111111111111,
+pub fn path1_count7<F: FnMut((u64, u64, u64, u64), (u64, u64, u64)) -> u64>(f: &mut F) -> u64 {
+    call(|| ((f)((0b00000000000000000000001111111111111111111111111111111111111111,
           0b00000000111111111111110000000000000011111111111111111111111111,
           0b00001111000011111111110000111111111100000000001111111111111111,
           0b00110011001100111111110011001111111100111111110000000011111111),
          (0b01010101010101000011110101010000111101000011110000111100001111,
           0b01010101010101001100110101010011001101001100110011001100110011,
           0b01010101010101010101010101010101010101010101010101010101010101)
-    ) & 0b11111_11111_11111_11111_11111_11111_11111_11111_11111_11111_11111_11111_11).count_ones()
+    ) & 0b11111_11111_11111_11111_11111_11111_11111_11111_11111_11111_11111_11111_11)).count_ones() as u64
 }
 /// Path Semantical Logic: Counts the number of solutions of a 8-argument boolean function,
 ///
 /// For more information, see the section "Path Semantical Logic" at the top level documentation.
-pub fn path1_count8<F: FnMut((u64, u64, u64, u64), (u64, u64, u64, u64)) -> u64>(f: &mut F) -> u32 {
-    ((f)((0b0000000000000000000000000000001111111111111111111111111111111111,
+pub fn path1_count8<F: FnMut((u64, u64, u64, u64), (u64, u64, u64, u64)) -> u64>(f: &mut F) -> u64 {
+    call(|| ((f)((0b0000000000000000000000000000001111111111111111111111111111111111,
           0b0000000011111111111111111111110000000000000000000000111111111111,
           0b0000111100001111111111111111110000111111111111111111000000000000,
           0b0011001100110011111111111111110011001111111111111111001111111111),
          (0b0101010101010100000000111111110101010000000011111111010000000011,
           0b0101010101010100001111000011110101010000111100001111010000111100,
           0b0101010101010100110011001100110101010011001100110011010011001100,
-          0b0101010101010101010101010101010101010101010101010101010101010101))).count_ones() +
-    ((f)((0b11111111111111111111111111111111111111,
+          0b0101010101010101010101010101010101010101010101010101010101010101)))).count_ones() as u64 +
+    call(|| ((f)((0b11111111111111111111111111111111111111,
           0b11111111111111111111111111111111111111,
           0b00000011111111111111111111111111111111,
           0b11111100000000000000001111111111111111),
@@ -807,13 +827,13 @@ pub fn path1_count8<F: FnMut((u64, u64, u64, u64), (u64, u64, u64, u64)) -> u64>
           0b00111100001111000011110000111100001111,
           0b11001100110011001100110011001100110011,
           0b01010101010101010101010101010101010101))
-       & 0b11111_11111_11111_11111_11111_11111_11111_111).count_ones()
+       & 0b11111_11111_11111_11111_11111_11111_11111_111)).count_ones() as u64
 }
 /// Path Semantical Logic: Counts the number of solutions of a 9-argument boolean function,
 ///
 /// For more information, see the section "Path Semantical Logic" at the top level documentation.
-pub fn path1_count9<F: FnMut((u64, u64, u64, u64, u64), (u64, u64, u64, u64)) -> u64>(f: &mut F) -> u32 {
-    ((f)((0b0000000000000000000000000000000000000000000000111111111111111111,
+pub fn path1_count9<F: FnMut((u64, u64, u64, u64, u64), (u64, u64, u64, u64)) -> u64>(f: &mut F) -> u64 {
+    call(|| ((f)((0b0000000000000000000000000000000000000000000000111111111111111111,
           0b0000000000000000111111111111111111111111111111000000000000000000,
           0b0000000011111111000000001111111111111111111111000000001111111111,
           0b0000111100001111000011110000111111111111111111000011110000111111,
@@ -821,8 +841,8 @@ pub fn path1_count9<F: FnMut((u64, u64, u64, u64, u64), (u64, u64, u64, u64)) ->
          (0b0101010101010101010101010101010000000011111111010101010101010000,
           0b0101010101010101010101010101010000111100001111010101010101010000,
           0b0101010101010101010101010101010011001100110011010101010101010011,
-          0b0101010101010101010101010101010101010101010101010101010101010101))).count_ones() +
-    ((f)((0b1111111111111111111111111111111111111111111111111111111111111111,
+          0b0101010101010101010101010101010101010101010101010101010101010101)))).count_ones() as u64 +
+    call(|| ((f)((0b1111111111111111111111111111111111111111111111111111111111111111,
           0b0000000000001111111111111111111111111111111111111111111111111111,
           0b1111111111110000000000000000000000111111111111111111111111111111,
           0b1111111111110000111111111111111111000000000000000000111111111111,
@@ -830,8 +850,8 @@ pub fn path1_count9<F: FnMut((u64, u64, u64, u64, u64), (u64, u64, u64, u64)) ->
          (0b0000111111110101010000000011111111010000000011111111000000001111,
           0b1111000011110101010000111100001111010000111100001111000011110000,
           0b0011001100110101010011001100110011010011001100110011001100110011,
-          0b0101010101010101010101010101010101010101010101010101010101010101))).count_ones() +
-    ((f)((0b11111111111111111111,
+          0b0101010101010101010101010101010101010101010101010101010101010101)))).count_ones() as u64 +
+    call(|| ((f)((0b11111111111111111111,
           0b11111111111111111111,
           0b11111111111111111111,
           0b11111111111111111111,
@@ -840,13 +860,13 @@ pub fn path1_count9<F: FnMut((u64, u64, u64, u64, u64), (u64, u64, u64, u64)) ->
           0b11110000111100001111,
           0b00110011001100110011,
           0b01010101010101010101))
-        & 0b11111_11111_11111_11111).count_ones()
+        & 0b11111_11111_11111_11111)).count_ones() as u64
 }
 /// Path Semantical Logic: Counts the number of solutions of a 10-argument boolean function,
 ///
 /// For more information, see the section "Path Semantical Logic" at the top level documentation.
-pub fn path1_count10<F: FnMut((u64, u64, u64, u64, u64), (u64, u64, u64, u64, u64)) -> u64>(f: &mut F) -> u32 {
-    ((f)((0b0000000000000000000000000000000000000000000000000000000000000011,
+pub fn path1_count10<F: FnMut((u64, u64, u64, u64, u64), (u64, u64, u64, u64, u64)) -> u64>(f: &mut F) -> u64 {
+    call(|| ((f)((0b0000000000000000000000000000000000000000000000000000000000000011,
           0b0000000000000000111111111111111111111111111111111111111111111100,
           0b0000000011111111000000001111111111111111111111111111111111111100,
           0b0000111100001111000011110000111111111111111111111111111111111100,
@@ -855,8 +875,8 @@ pub fn path1_count10<F: FnMut((u64, u64, u64, u64, u64), (u64, u64, u64, u64, u6
           0b0101010101010101010101010101010000000011111111000000001111111101,
           0b0101010101010101010101010101010000111100001111000011110000111101,
           0b0101010101010101010101010101010011001100110011001100110011001101,
-          0b0101010101010101010101010101010101010101010101010101010101010101))).count_ones() +
-    ((f)((0b1111111111111111111111111111111111111111111111111111111111111111,
+          0b0101010101010101010101010101010101010101010101010101010101010101)))).count_ones() as u64 +
+    call(|| ((f)((0b1111111111111111111111111111111111111111111111111111111111111111,
           0b0000000000000000000000000000000000000000000011111111111111111111,
           0b0000001111111111111111111111111111111111111100000000000000000000,
           0b0011110000111111111111111111111111111111111100001111111111111111,
@@ -865,8 +885,8 @@ pub fn path1_count10<F: FnMut((u64, u64, u64, u64, u64), (u64, u64, u64, u64, u6
           0b0101010101010000000011111111000000001111111101010100000000111111,
           0b0101010101010000111100001111000011110000111101010100001111000011,
           0b0101010101010011001100110011001100110011001101010100110011001100,
-          0b0101010101010101010101010101010101010101010101010101010101010101))).count_ones() +
-    ((f)((0b1111111111111111111111111111111111111111111111111111111111111111,
+          0b0101010101010101010101010101010101010101010101010101010101010101)))).count_ones() as u64 +
+    call(|| ((f)((0b1111111111111111111111111111111111111111111111111111111111111111,
           0b1111111111111111111111111111111111111111111111111111111111111111,
           0b0000000000000000001111111111111111111111111111111111111111111111,
           0b1111111111111111110000000000000000000000000000000000111111111111,
@@ -875,8 +895,8 @@ pub fn path1_count10<F: FnMut((u64, u64, u64, u64, u64), (u64, u64, u64, u64, u6
           0b1100000000111111110100000000111111110000000011111111000000001111,
           0b1100001111000011110100001111000011110000111100001111000011110000,
           0b1100110011001100110100110011001100110011001100110011001100110011,
-          0b0101010101010101010101010101010101010101010101010101010101010101))).count_ones() +
-    ((f)((0b1111111111111111111111111111111111111111111111111111,
+          0b0101010101010101010101010101010101010101010101010101010101010101)))).count_ones() as u64 +
+    call(|| ((f)((0b1111111111111111111111111111111111111111111111111111,
           0b1111111111111111111111111111111111111111111111111111,
           0b1111111111111111111111111111111111111111111111111111,
           0b1111111111111111111111111111111111111111111111111111,
@@ -886,7 +906,7 @@ pub fn path1_count10<F: FnMut((u64, u64, u64, u64, u64), (u64, u64, u64, u64, u6
           0b1111000011110000111100001111000011110000111100001111,
           0b0011001100110011001100110011001100110011001100110011,
           0b0101010101010101010101010101010101010101010101010101))
-        & 0b11111_11111_11111_11111_11111_11111_11111_11111_11111_11111_11).count_ones()
+        & 0b11111_11111_11111_11111_11111_11111_11111_11111_11111_11111_11)).count_ones() as u64
 }
 /// Path Semantical Logic: Counts the number of solutions of a n-argument boolean function,
 ///
