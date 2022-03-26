@@ -124,3 +124,40 @@ fn main() {
     }));
 }
 ```
+
+### Path Semantical Quality
+
+Pocket-Prover has a model of [Path Semantical Quality](https://github.com/advancedresearch/path_semantics/blob/master/papers-wip2/path-semantical-quality.pdf)
+that resembles quantum logic.
+
+To write `x ~~ y` you use `q(x, y)` or `qual(x, y)`.
+
+`q(x, x)` is the same as `qubit(x)`.
+`q(x, y)` where `x` and `y` are symbolic distinct is the same as `T`.
+
+A qubit is a kind of "superposition".
+One can also think about it as introducing a new argument `qubit(x)` that depends on `x`.
+
+Since qubits can collide with other propositions,
+one must repeat measurements e.g. using `measure` to get classical states.
+However, sometimes one might wish to amplify quantum states, using `amplify` or `amp`.
+
+To use quality with path semantics, one should use `ps_core`.
+Path Semantical Logic is designed for equality, not quality.
+
+```rust
+use pocket_prover::*;
+
+fn main() {
+    println!("Path semantics: {}", measure(1, || prove!(&mut |a, b, c, d| {
+        imply(
+            and!(
+                ps_core(a, b, c, d),
+                imply(a, c),
+                imply(b, d)
+            ),
+            imply(qual(a, b), qual(c, d))
+        )
+    })));
+}
+```
