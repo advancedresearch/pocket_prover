@@ -12,3 +12,5 @@ readme = "README.md"
 edition = "2018"
 
 [dependencies]
+rand = {version = "0.8.5", features = ["std_rng"]}
+current = "0.1.2"

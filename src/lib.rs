@@ -129,6 +129,9 @@
 
 pub mod extract;
 
+pub use qual as q;
+pub use amplify as amp;
+
 /// An AND relation of variable arguments.
 #[macro_export]
 macro_rules! and(
@@ -533,68 +536,138 @@ pub const P5: u64 = 0b11111111_11111111_11111111_11111111_00000000_00000000_0000
 /// Used to alternate higher than 6 arguments, set to `1`.
 pub const T: u64 = 0b11111111_11111111_11111111_11111111_11111111_11111111_11111111_11111111;
 
+/// Implemented by observables.
+pub trait Observable {
+    /// Gets the maximum energy level of observable.
+    fn max_energy() -> Self;
+    /// Gets the minimum energy level of two observables.
+    fn min_energy(self, other: Self) -> Self;
+}
+
+impl Observable for bool {
+    fn max_energy() -> bool {true}
+    fn min_energy(self, other: bool) -> bool {self && other}
+}
+
+impl Observable for u32 {
+    fn max_energy() -> u32 {std::u32::MAX}
+    fn min_energy(self, other: u32) -> u32 {self.min(other)}
+}
+
+/// Prepares a qubit using a proposition as seed.
+pub fn qubit(a: u64) -> u64 {
+    use rand::{Rng, SeedableRng};
+    use rand::rngs::StdRng;
+    let r = unsafe {&*current::Current::<u64>::new()};
+    let mut rng = StdRng::seed_from_u64(a ^ *r);
+    rng.gen()
+}
+
+/// Amplify a "wavefunction" of a proposition using its qubit transform.
+pub fn amplify(n: u32, mut a: u64) -> u64 {
+    for _ in 0..n {
+        a |= qubit(a);
+    }
+    a
+}
+
+/// Path semantical quality `a ~~ b`.
+pub fn qual(a: u64, b: u64) -> u64 {
+    and(eq(a, b), if a == b {qubit(a)} else {T})
+}
+
+/// Assumes the path semantical core axiom.
+pub fn ps_core(a: u64, b: u64, c: u64, d: u64) -> u64 {
+    imply(and!(qual(a, b), imply(a, c), imply(b, d)), qual(c, d))
+}
+
+/// Measures result repeatedly.
+pub fn measure<O: Observable>(n: u32, mut fun: impl FnMut() -> O) -> O {
+    let mut b = O::max_energy();
+    for _ in 0..n {
+        b = b.min_energy(fun());
+    }
+    b
+}
+
+fn call(mut fun: impl FnMut() -> u64) -> u64 {
+    let mut r = rand::random::<u64>();
+    let guard = current::CurrentGuard::new(&mut r);
+    let res = fun();
+    drop(guard);
+    res
+}
+
 /// Counts the number of solutions of a 1-argument boolean function.
-pub fn count1<F: FnMut(u64) -> u64>(f: &mut F) -> u32 {((f)(P0) & 0x3).count_ones()}
+pub fn count1<F: FnMut(u64) -> u64>(f: &mut F) -> u32 {
+    call(|| ((f)(P0) & 0x3)).count_ones()
+}
 /// Counts the number of solutions of a 2-argument boolean function.
-pub fn count2<F: FnMut(u64, u64) -> u64>(f: &mut F) -> u32 {((f)(P0, P1) & 0xf).count_ones()}
+pub fn count2<F: FnMut(u64, u64) -> u64>(f: &mut F) -> u32 {
+    call(|| ((f)(P0, P1) & 0xf)).count_ones()
+}
 /// Counts the number of solutions of a 3-argument boolean function.
-pub fn count3<F: FnMut(u64, u64, u64) -> u64>(f: &mut F) -> u32 {((f)(P0, P1, P2) & 0xff).count_ones()}
+pub fn count3<F: FnMut(u64, u64, u64) -> u64>(f: &mut F) -> u32 {
+    call(|| ((f)(P0, P1, P2) & 0xff)).count_ones()
+}
 /// Counts the number of solutions of a 4-argument boolean function.
-pub fn count4<F: FnMut(u64, u64, u64, u64) -> u64>(f: &mut F) -> u32 {((f)(P0, P1, P2, P3) & 0xffff).count_ones()}
+pub fn count4<F: FnMut(u64, u64, u64, u64) -> u64>(f: &mut F) -> u32 {
+    call(|| ((f)(P0, P1, P2, P3) & 0xffff)).count_ones()
+}
 /// Counts the number of solutions of a 5-argument boolean function.
 pub fn count5<F: FnMut(u64, u64, u64, u64, u64) -> u64>(f: &mut F) -> u32 {
-    ((f)(P0, P1, P2, P3, P4) & 0xffff_ffff).count_ones()
+    call(|| ((f)(P0, P1, P2, P3, P4) & 0xffff_ffff)).count_ones()
 }
 /// Counts the number of solutions of a 6-argument boolean function.
 pub fn count6<F: FnMut(u64, u64, u64, u64, u64, u64) -> u64>(f: &mut F) -> u32 {
-    (f)(P0, P1, P2, P3, P4, P5).count_ones()
+    call(|| (f)(P0, P1, P2, P3, P4, P5)).count_ones()
 }
 /// Counts the number of solutions of a 7-argument boolean function.
 pub fn count7<F: FnMut(u64, u64, u64, u64, u64, u64, u64) -> u64>(f: &mut F) -> u32 {
-    (f)(P0, P1, P2, P3, P4, P5, F).count_ones() +
-    (f)(P0, P1, P2, P3, P4, P5, T).count_ones()
+    call(|| (f)(P0, P1, P2, P3, P4, P5, F)).count_ones() +
+    call(|| (f)(P0, P1, P2, P3, P4, P5, T)).count_ones()
 }
 /// Counts the number of solutions of an 8-argument boolean function.
 pub fn count8<F: FnMut(u64, u64, u64, u64, u64, u64, u64, u64) -> u64>(f: &mut F) -> u32 {
-    (f)(P0, P1, P2, P3, P4, P5, F, F).count_ones() +
-    (f)(P0, P1, P2, P3, P4, P5, F, T).count_ones() +
-    (f)(P0, P1, P2, P3, P4, P5, T, F).count_ones() +
-    (f)(P0, P1, P2, P3, P4, P5, T, T).count_ones()
+    call(|| (f)(P0, P1, P2, P3, P4, P5, F, F)).count_ones() +
+    call(|| (f)(P0, P1, P2, P3, P4, P5, F, T)).count_ones() +
+    call(|| (f)(P0, P1, P2, P3, P4, P5, T, F)).count_ones() +
+    call(|| (f)(P0, P1, P2, P3, P4, P5, T, T)).count_ones()
 }
 /// Counts the number of solutions of a 9-argument boolean function.
 pub fn count9<F: FnMut(u64, u64, u64, u64, u64, u64, u64, u64, u64) -> u64>(f: &mut F) -> u32 {
-    (f)(P0, P1, P2, P3, P4, P5, F, F, F).count_ones() +
-    (f)(P0, P1, P2, P3, P4, P5, F, F, T).count_ones() +
-    (f)(P0, P1, P2, P3, P4, P5, F, T, F).count_ones() +
-    (f)(P0, P1, P2, P3, P4, P5, F, T, T).count_ones() +
-    (f)(P0, P1, P2, P3, P4, P5, T, F, F).count_ones() +
-    (f)(P0, P1, P2, P3, P4, P5, T, F, T).count_ones() +
-    (f)(P0, P1, P2, P3, P4, P5, T, T, F).count_ones() +
-    (f)(P0, P1, P2, P3, P4, P5, T, T, T).count_ones()
+    call(|| (f)(P0, P1, P2, P3, P4, P5, F, F, F)).count_ones() +
+    call(|| (f)(P0, P1, P2, P3, P4, P5, F, F, T)).count_ones() +
+    call(|| (f)(P0, P1, P2, P3, P4, P5, F, T, F)).count_ones() +
+    call(|| (f)(P0, P1, P2, P3, P4, P5, F, T, T)).count_ones() +
+    call(|| (f)(P0, P1, P2, P3, P4, P5, T, F, F)).count_ones() +
+    call(|| (f)(P0, P1, P2, P3, P4, P5, T, F, T)).count_ones() +
+    call(|| (f)(P0, P1, P2, P3, P4, P5, T, T, F)).count_ones() +
+    call(|| (f)(P0, P1, P2, P3, P4, P5, T, T, T)).count_ones()
 }
 /// Counts the number of solutions of a 10-argument boolean function.
 pub fn count10<F: FnMut(u64, u64, u64, u64, u64, u64, u64, u64, u64, u64) -> u64>(f: &mut F) -> u32 {
-    (f)(P0, P1, P2, P3, P4, P5, F, F, F, F).count_ones() +
-    (f)(P0, P1, P2, P3, P4, P5, F, F, F, T).count_ones() +
-    (f)(P0, P1, P2, P3, P4, P5, F, F, T, F).count_ones() +
-    (f)(P0, P1, P2, P3, P4, P5, F, F, T, T).count_ones() +
-    (f)(P0, P1, P2, P3, P4, P5, F, T, F, F).count_ones() +
-    (f)(P0, P1, P2, P3, P4, P5, F, T, F, T).count_ones() +
-    (f)(P0, P1, P2, P3, P4, P5, F, T, T, F).count_ones() +
-    (f)(P0, P1, P2, P3, P4, P5, F, T, T, T).count_ones() +
-    (f)(P0, P1, P2, P3, P4, P5, T, F, F, F).count_ones() +
-    (f)(P0, P1, P2, P3, P4, P5, T, F, F, T).count_ones() +
-    (f)(P0, P1, P2, P3, P4, P5, T, F, T, F).count_ones() +
-    (f)(P0, P1, P2, P3, P4, P5, T, F, T, T).count_ones() +
-    (f)(P0, P1, P2, P3, P4, P5, T, T, F, F).count_ones() +
-    (f)(P0, P1, P2, P3, P4, P5, T, T, F, T).count_ones() +
-    (f)(P0, P1, P2, P3, P4, P5, T, T, T, F).count_ones() +
-    (f)(P0, P1, P2, P3, P4, P5, T, T, T, T).count_ones()
+    call(|| (f)(P0, P1, P2, P3, P4, P5, F, F, F, F)).count_ones() +
+    call(|| (f)(P0, P1, P2, P3, P4, P5, F, F, F, T)).count_ones() +
+    call(|| (f)(P0, P1, P2, P3, P4, P5, F, F, T, F)).count_ones() +
+    call(|| (f)(P0, P1, P2, P3, P4, P5, F, F, T, T)).count_ones() +
+    call(|| (f)(P0, P1, P2, P3, P4, P5, F, T, F, F)).count_ones() +
+    call(|| (f)(P0, P1, P2, P3, P4, P5, F, T, F, T)).count_ones() +
+    call(|| (f)(P0, P1, P2, P3, P4, P5, F, T, T, F)).count_ones() +
+    call(|| (f)(P0, P1, P2, P3, P4, P5, F, T, T, T)).count_ones() +
+    call(|| (f)(P0, P1, P2, P3, P4, P5, T, F, F, F)).count_ones() +
+    call(|| (f)(P0, P1, P2, P3, P4, P5, T, F, F, T)).count_ones() +
+    call(|| (f)(P0, P1, P2, P3, P4, P5, T, F, T, F)).count_ones() +
+    call(|| (f)(P0, P1, P2, P3, P4, P5, T, F, T, T)).count_ones() +
+    call(|| (f)(P0, P1, P2, P3, P4, P5, T, T, F, F)).count_ones() +
+    call(|| (f)(P0, P1, P2, P3, P4, P5, T, T, F, T)).count_ones() +
+    call(|| (f)(P0, P1, P2, P3, P4, P5, T, T, T, F)).count_ones() +
+    call(|| (f)(P0, P1, P2, P3, P4, P5, T, T, T, T)).count_ones()
 }
 /// Counts the number of solutions of an n-argument boolean function.
 pub fn countn(n: usize, fun: &mut dyn FnMut(&[u64]) -> u64) -> u64 {
     match n {
-        0 => fun(&[]).count_ones() as u64,
+        0 => call(|| fun(&[])).count_ones() as u64,
         1 => count1(&mut |a| fun(&[a])) as u64,
         2 => count2(&mut |a, b| fun(&[a, b])) as u64,
         3 => count3(&mut |a, b, c| fun(&[a, b, c])) as u64,
@@ -621,7 +694,7 @@ pub fn countn(n: usize, fun: &mut dyn FnMut(&[u64]) -> u64) -> u64 {
                     args[8] = if (i & 0b100000000) == 0b100000000 {T} else {F};
                     sum += countn(n-9, &mut |vs: &[u64]| {
                         for i in 0..n-9 {args[i+9] = vs[i]}
-                        fun(&args)
+                        call(|| fun(&args))
                     });
                 }
                 sum
@@ -636,7 +709,7 @@ pub fn countn(n: usize, fun: &mut dyn FnMut(&[u64]) -> u64) -> u64 {
                     args[4] = if (i & 0b10000) == 0b10000 {T} else {F};
                     sum += countn(n-5, &mut |vs: &[u64]| {
                         for i in 0..n-5 {args[i+5] = vs[i]}
-                        fun(&args)
+                        call(|| fun(&args))
                     });
                 }
                 sum
@@ -820,7 +893,7 @@ pub fn path1_count10<F: FnMut((u64, u64, u64, u64, u64), (u64, u64, u64, u64, u6
 /// For more information, see the section "Path Semantical Logic" at the top level documentation.
 pub fn path1_countn(n: usize, fun: &mut dyn FnMut(&[u64], &[u64]) -> u64) -> u64 {
     match n {
-        0 => fun(&[], &[]).count_ones() as u64,
+        0 => call(|| fun(&[], &[])).count_ones() as u64,
         1 => path1_count1(&mut |a| fun(&[a], &[])) as u64,
         2 => path1_count2(&mut |a, b| fun(&[a], &[b])) as u64,
         3 => path1_count3(&mut |(a, b), c| fun(&[a, b], &[c])) as u64,
@@ -860,7 +933,7 @@ pub fn path1_countnm(f: usize, x: usize, fun: &mut dyn FnMut(&[u64], &[u64]) -> 
     let mut fs = vec![T; f];
     let mut all_fs_one = countn(x, &mut |xs| fun(&*fs, xs));
     // Subtract first and last case.
-    all_fs_one -= (fun(&*fs, &*xs) & 0b11).count_ones() as u64;
+    all_fs_one -= call(|| (fun(&*fs, &*xs) & 0b11)).count_ones() as u64;
     let mut sum_fs_zero = 0;
     // Set one zero in `fs` by turn.
     for i in 0..f {
@@ -868,7 +941,7 @@ pub fn path1_countnm(f: usize, x: usize, fun: &mut dyn FnMut(&[u64], &[u64]) -> 
         // Enumerate all cases when there is one zero in `fs`.
         sum_fs_zero += countn(x, &mut |xs| fun(&*fs, xs));
         // Subtract first and last case.
-        sum_fs_zero -= (fun(&*fs, &*xs) & 0b11).count_ones() as u64;
+        sum_fs_zero -= call(|| (fun(&*fs, &*xs) & 0b11)).count_ones() as u64;
         fs[i] = T;
     }
     all_xs_zero + all_xs_one + all_fs_one + sum_fs_zero
