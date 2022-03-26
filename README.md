@@ -133,7 +133,7 @@ that resembles quantum logic.
 To write `x ~~ y` you use `q(x, y)` or `qual(x, y)`.
 
 `q(x, x)` is the same as `qubit(x)`.
-`q(x, y)` where `x` and `y` are symbolic distinct is the same as `T`.
+`q(x, y)` where `x` and `y` are symbolic distinct is the same as `eq(x, y)`.
 
 A qubit is a kind of "superposition".
 One can also think about it as introducing a new argument `qubit(x)` that depends on `x`.
