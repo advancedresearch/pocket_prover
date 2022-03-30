@@ -1,6 +1,6 @@
 #![deny(missing_docs)]
 
-//! # pocket_prover
+//! # Pocket-Prover
 //! A fast, brute force, automatic theorem prover for first order logic
 //!
 //! - For generic automated theorem proving, see [monotonic_solver](https://github.com/advancedresearch/monotonic_solver)
@@ -135,7 +135,8 @@
 //! To write `x ~~ y` you use `q(x, y)` or `qual(x, y)`.
 //!
 //! `q(x, x)` is the same as `qubit(x)`.
-//! `q(x, y)` where `x` and `y` are symbolic distinct is the same as `eq(x, y)`.
+//! `q(x, y)` where `x` and `y` are symbolic distinct is the same as
+//! `and!(eq(x, y), q(x, x), q(y, y))`.
 //!
 //! A qubit is a kind of "superposition".
 //! One can also think about it as introducing a new argument `qubit(x)` that depends on `x`.
