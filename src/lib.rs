@@ -610,7 +610,7 @@ pub fn amplify(n: u32, mut a: u64) -> u64 {
 
 /// Path semantical quality `a ~~ b`.
 pub fn qual(a: u64, b: u64) -> u64 {
-    and(eq(a, b), if a == b {qubit(a)} else {T})
+    and(eq(a, b), if a == b {qubit(a)} else {and(qual(a, a), qual(b, b))})
 }
 
 /// Assumes the path semantical core axiom.
