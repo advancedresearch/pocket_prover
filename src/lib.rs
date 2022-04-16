@@ -597,8 +597,13 @@ pub fn qubit(a: u64) -> u64 {
     use rand::{Rng, SeedableRng};
     use rand::rngs::StdRng;
     let r = unsafe {&*current::Current::<u64>::new()};
-    let mut rng = StdRng::seed_from_u64(a ^ *r);
-    rng.gen()
+    if a & 1 == 1 {
+        let mut rng = StdRng::seed_from_u64(not(a) ^ *r);
+        not(rng.gen())
+    } else {
+        let mut rng = StdRng::seed_from_u64(a ^ *r);
+        rng.gen()
+    }
 }
 
 /// Amplify a "wavefunction" of a proposition using its qubit transform.
