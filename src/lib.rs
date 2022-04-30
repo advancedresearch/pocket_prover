@@ -616,6 +616,17 @@ pub fn amplify(n: u32, mut a: u64) -> u64 {
 /// Path semantical quality `a ~~ b`.
 pub fn qual(a: u64, b: u64) -> u64 {and!(eq(a, b), qubit(a), qubit(b))}
 
+/// Aligns equality of qubits up to some homotopy level.
+pub fn hom_eq(n: u32, mut a: u64, mut b: u64) -> u64 {
+    let mut res = T;
+    for _ in 0..n {
+        res = and(res, eq(a, b));
+        a = qubit(a);
+        b = qubit(b);
+    }
+    res
+}
+
 /// Assumes the path semantical core axiom.
 pub fn ps_core(a: u64, b: u64, c: u64, d: u64) -> u64 {
     imply(and!(qual(a, b), imply(a, c), imply(b, d)), qual(c, d))
