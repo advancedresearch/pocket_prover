@@ -632,6 +632,14 @@ pub fn ps_core(a: u64, b: u64, c: u64, d: u64) -> u64 {
     imply(and!(qual(a, b), imply(a, c), imply(b, d)), qual(c, d))
 }
 
+/// Defines a proposition relation of proposition `x` to potential proofs `a` and `b`.
+pub fn is_prop(x: u64, a: u64, b: u64) -> u64 {
+    imply(
+        and(imply(a, x), imply(b, x)),
+        imply(T, eq(a, b))
+    )
+}
+
 /// Defines a set relation from a set `x` to potential members `a` and `b`.
 pub fn is_set(x: u64, a: u64, b: u64) -> u64 {
     imply(
