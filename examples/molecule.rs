@@ -25,9 +25,9 @@ fn main() {
     })));
 }
 
-fn atom(a: u64, atom: u64) -> u64 {eq(q(a, a), atom)}
-fn bond(a: u64, b: u64, bond: u64) -> u64 {and(eq(a, b), eq(q(a, b), bond))}
-fn react2(a: [u64; 2], b: [u64; 2]) -> u64 {
+pub fn atom(a: u64, atom: u64) -> u64 {eq(q(a, a), atom)}
+pub fn bond(a: u64, b: u64, bond: u64) -> u64 {and(eq(a, b), eq(q(a, b), bond))}
+pub fn react2(a: [u64; 2], b: [u64; 2]) -> u64 {
     and!(
         xor!(
             and(
@@ -38,7 +38,7 @@ fn react2(a: [u64; 2], b: [u64; 2]) -> u64 {
     )
 }
 
-fn water(H: u64, O: u64, a: u64, b: u64, c: u64) -> u64 {
+pub fn water(H: u64, O: u64, a: u64, b: u64, c: u64) -> u64 {
     and!(
         atom(a, H),
         atom(b, O),
@@ -48,7 +48,7 @@ fn water(H: u64, O: u64, a: u64, b: u64, c: u64) -> u64 {
     )
 }
 
-fn salt(Na: u64, Cl: u64, a: u64, b: u64) -> u64 {
+pub fn salt(Na: u64, Cl: u64, a: u64, b: u64) -> u64 {
     and!(
         atom(a, Na),
         atom(b, Cl),
@@ -56,7 +56,7 @@ fn salt(Na: u64, Cl: u64, a: u64, b: u64) -> u64 {
     )
 }
 
-fn methane(H: u64, C: u64, a: u64, b: [u64; 4]) -> u64 {
+pub fn methane(H: u64, C: u64, a: u64, b: [u64; 4]) -> u64 {
     and!(
         atom(a, C),
         atom(b[0], H),
@@ -70,7 +70,7 @@ fn methane(H: u64, C: u64, a: u64, b: [u64; 4]) -> u64 {
     )
 }
 
-fn oxygen(O: u64, E2: u64, a: u64, b: u64) -> u64 {
+pub fn oxygen(O: u64, E2: u64, a: u64, b: u64) -> u64 {
     and!(
         atom(a, O),
         atom(b, O),
