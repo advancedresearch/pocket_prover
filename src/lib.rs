@@ -648,6 +648,40 @@ pub fn is_set(x: u64, a: u64, b: u64) -> u64 {
     )
 }
 
+/// Defines a groupoid relation from `x` to `a` and `b`.
+pub fn is_groupoid(x: u64, a: u64, b: u64) -> u64 {
+    imply(
+        and(imply(a, x), imply(b, x)),
+        imply(eq(qubit(a), qubit(b)), eq(qubit(qubit(a)), qubit(qubit(b))))
+    )
+}
+
+/// Defines an n-groupoid relation from `x` to `a` and `b`.
+pub fn is_groupoid_n(n: u32, x: u64, a: u64, b: u64) -> u64 {
+    let cond = and(imply(a, x), imply(b, x));
+    let mut a = a;
+    let mut b = b;
+    for _ in 0..n {
+        a = qubit(a);
+        b = qubit(b);
+    }
+    imply(cond, imply(eq(a, b), eq(qubit(a), qubit(b))))
+}
+
+/// Defines a homotopy level `n` relation from `x` to `a` and `b`.
+pub fn is_hom_lev_n(n: u32, x: u64, a: u64, b: u64) -> u64 {
+    match n {
+        0 => T,
+        1 => is_prop(x, a, b),
+        n => is_groupoid_n(n - 2, x, a, b),
+    }
+}
+
+/// Assumes univalence axiom for some homotopy level.
+pub fn univ(n: u32, a: u64, b: u64) -> u64 {
+    hom_eq(n, eq(a, b), hom_eq(n, a, b))
+}
+
 /// Measures result repeatedly.
 pub fn measure<O: Observable>(n: u32, mut fun: impl FnMut() -> O) -> O {
     let mut b = O::max_energy();
