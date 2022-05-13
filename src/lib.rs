@@ -632,6 +632,14 @@ pub fn ps_core(a: u64, b: u64, c: u64, d: u64) -> u64 {
     imply(and!(qual(a, b), imply(a, c), imply(b, d)), qual(c, d))
 }
 
+/// Defines a set relation from a set `x` to potential members `a` and `b`.
+pub fn is_set(x: u64, a: u64, b: u64) -> u64 {
+    imply(
+        and(imply(a, x), imply(b, x)),
+        imply(eq(a, b), eq(qubit(a), qubit(b)))
+    )
+}
+
 /// Measures result repeatedly.
 pub fn measure<O: Observable>(n: u32, mut fun: impl FnMut() -> O) -> O {
     let mut b = O::max_energy();
