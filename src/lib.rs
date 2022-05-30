@@ -167,6 +167,7 @@
 pub mod extract;
 
 pub use qual as q;
+pub use aqual as aq;
 pub use amplify as amp;
 
 /// An AND relation of variable arguments.
@@ -616,6 +617,11 @@ pub fn amplify(n: u32, mut a: u64) -> u64 {
 /// Path semantical quality `a ~~ b`.
 pub fn qual(a: u64, b: u64) -> u64 {and!(eq(a, b), qubit(a), qubit(b))}
 
+/// Path semantical aquality `a ~¬~ b`.
+///
+/// For more information, see [paper](https://github.com/advancedresearch/path_semantics/blob/master/papers-wip2/path-semantical-aquality.pdf).
+pub fn aqual(a: u64, b: u64) -> u64 {and!(eq(a, b), qubit(not(a)), qubit(not(b)))}
+
 /// Aligns equality of qubits up to some homotopy level.
 pub fn hom_eq(n: u32, mut a: u64, mut b: u64) -> u64 {
     let mut res = T;
@@ -630,6 +636,16 @@ pub fn hom_eq(n: u32, mut a: u64, mut b: u64) -> u64 {
 /// Assumes the path semantical core axiom.
 pub fn ps_core(a: u64, b: u64, c: u64, d: u64) -> u64 {
     imply(and!(qual(a, b), imply(a, c), imply(b, d)), qual(c, d))
+}
+
+/// Assumes the path semantical acore axiom.
+///
+/// This is the same as the path semantical core axiom,
+/// but using aquality instead of quality.
+///
+/// For more information, see the "aqual" function.
+pub fn ps_acore(a: u64, b: u64, c: u64, d: u64) -> u64 {
+    imply(and!(aqual(a, b), imply(a, c), imply(b, d)), aqual(c, d))
 }
 
 /// Defines a proposition relation of proposition `x` to potential proofs `a` and `b`.
