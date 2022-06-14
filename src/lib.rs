@@ -168,6 +168,7 @@ pub mod extract;
 
 pub use qual as q;
 pub use aqual as aq;
+pub use contra_qual as cq;
 pub use amplify as amp;
 
 /// An AND relation of variable arguments.
@@ -621,6 +622,13 @@ pub fn qual(a: u64, b: u64) -> u64 {and!(eq(a, b), qubit(a), qubit(b))}
 ///
 /// For more information, see [paper](https://github.com/advancedresearch/path_semantics/blob/master/papers-wip2/path-semantical-aquality.pdf).
 pub fn aqual(a: u64, b: u64) -> u64 {and!(eq(a, b), qubit(not(a)), qubit(not(b)))}
+
+/// Path semantical contravariant quality `a ¬~~ b`.
+///
+/// For more information, see [paper](https://github.com/advancedresearch/path_semantics/blob/master/papers-wip2/path-semantical-contravariant-quality.pdf).
+pub fn contra_qual(a: u64, b: u64) -> u64 {
+    and!(eq(a, b), not(qubit(a)), qubit(b))
+}
 
 /// Aligns equality of qubits up to some homotopy level.
 pub fn hom_eq(n: u32, mut a: u64, mut b: u64) -> u64 {
