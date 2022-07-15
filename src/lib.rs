@@ -656,6 +656,21 @@ pub fn ps_acore(a: u64, b: u64, c: u64, d: u64) -> u64 {
     imply(and!(aqual(a, b), imply(a, c), imply(b, d)), aqual(c, d))
 }
 
+/// Assumes a strong version of the path semantical core axiom.
+pub fn ps_core_eq(a: u64, b: u64, c: u64, d: u64) -> u64 {
+    imply(and!(imply(a, c), imply(b, d)), eq(qual(a, b), qual(c, d)))
+}
+
+/// Assumes a strong version of the path semantical acore axiom.
+///
+/// This is the same as the strong version of path semantical core axiom,
+/// but using aquality instead of quality.
+///
+/// For more information, see the "aqual" function.
+pub fn ps_acore_eq(a: u64, b: u64, c: u64, d: u64) -> u64 {
+    imply(and!(imply(a, c), imply(b, d)), eq(aqual(a, b), aqual(c, d)))
+}
+
 /// Defines a proposition relation of proposition `x` to potential proofs `a` and `b`.
 pub fn is_prop(x: u64, a: u64, b: u64) -> u64 {
     imply(
