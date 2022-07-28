@@ -615,6 +615,9 @@ pub fn amplify(n: u32, mut a: u64) -> u64 {
     a
 }
 
+/// Path semantical continuous map `a ~> b`.
+pub fn cont(a: u64, b: u64) -> u64 {and(imply(a, b), imply(qubit(a), qubit(b)))}
+
 /// Path semantical quality `a ~~ b`.
 pub fn qual(a: u64, b: u64) -> u64 {and!(eq(a, b), qubit(a), qubit(b))}
 
