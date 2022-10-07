@@ -167,6 +167,7 @@
 pub mod extract;
 
 pub use qual as q;
+pub use qubit as qu;
 pub use aqual as aq;
 pub use contra_qual as cq;
 pub use amplify as amp;
