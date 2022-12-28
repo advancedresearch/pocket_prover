@@ -634,15 +634,42 @@ pub fn contra_qual(a: u64, b: u64) -> u64 {
     and!(eq(a, b), not(qubit(a)), qubit(b))
 }
 
-/// Aligns equality of qubits up to some homotopy level.
-pub fn hom_eq(n: u32, mut a: u64, mut b: u64) -> u64 {
+/// Path semantical function `f_n(a, b)` up to some homotopy level `n`.
+pub fn hom_f(f: fn(u64, u64) -> u64, n: u32, mut a: u64, mut b: u64) -> u64 {
     let mut res = T;
     for _ in 0..n {
-        res = and(res, eq(a, b));
+        res = and(res, f(a, b));
         a = qubit(a);
         b = qubit(b);
     }
     res
+}
+
+/// Aligns implication of qubits up to some homotopy level.
+///
+/// This is also path semantical continuous map `a ~>_n b` up to homotopy level `n`.
+pub fn hom_imply(n: u32, a: u64, b: u64) -> u64 {
+    hom_f(imply, n, a, b)
+}
+
+/// Aligns equality of qubits up to some homotopy level.
+pub fn hom_eq(n: u32, a: u64, b: u64) -> u64 {
+    hom_f(eq, n, a, b)
+}
+
+/// Aligns logical AND of qubits up to some homotopy level.
+pub fn hom_and(n: u32, a: u64, b: u64) -> u64 {
+    hom_f(and, n, a, b)
+}
+
+/// Aligns logical OR of qubits up to some homotopy level.
+pub fn hom_or(n: u32, a: u64, b: u64) -> u64 {
+    hom_f(or, n, a, b)
+}
+
+/// Aligns logical XOR of qubits up to some homotopy level.
+pub fn hom_xor(n: u32, a: u64, b: u64) -> u64 {
+    hom_f(xor, n, a, b)
 }
 
 /// Assumes the path semantical core axiom.
