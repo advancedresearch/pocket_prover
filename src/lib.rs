@@ -170,6 +170,7 @@ pub use qual as q;
 pub use qubit as qu;
 pub use aqual as aq;
 pub use contra_qual as cq;
+pub use platonic_qubit as pqu;
 pub use amplify as amp;
 
 /// An AND relation of variable arguments.
@@ -593,6 +594,47 @@ impl Observable for u64 {
     fn max_energy() -> u64 {std::u64::MAX}
     fn min_energy(self, other: u64) -> u64 {self.min(other)}
 }
+
+/// Removes Sesh property from a proposition.
+///
+/// Sesh is the property that `!~a == ~!a`, which holds for `qubit` (`~`).
+/// Sometimes you want to get rid of this property (see `platonic_qubit`).
+pub fn un_sesh(a: u64) -> u64 {
+    use rand::{Rng, SeedableRng};
+    use rand::rngs::StdRng;
+
+    let r = unsafe {&*current::Current::<u64>::new()};
+    let mut rng2 = StdRng::seed_from_u64(*r);
+    let pat: u64 = rng2.gen();
+    let pat2: u64 = rng2.gen();
+    let pat2 = if pat & 1 != pat2 & 1 {not(pat2)} else {pat2};
+
+    if a & 1 == 1 {a ^ pat} else {a ^ pat2}
+}
+
+/// Restore Sesh property to a proposition.
+///
+/// This is the inverse of `un_sesh`.
+/// `re_sesh . un_sesh <=> id`.
+pub fn re_sesh(a: u64) -> u64 {
+    use rand::{Rng, SeedableRng};
+    use rand::rngs::StdRng;
+
+    let r = unsafe {&*current::Current::<u64>::new()};
+    let mut rng2 = StdRng::seed_from_u64(*r);
+    let pat: u64 = rng2.gen();
+    let pat2: u64 = rng2.gen();
+    let pat2 = if pat & 1 != pat2 & 1 {not(pat2)} else {pat2};
+
+    let a1 = a ^ pat;
+    let a2 = a ^ pat2;
+    if a1 & 1 == 1 {a1} else {a2}
+}
+
+/// Prepares a platonic qubit using a proposition as seed.
+///
+/// Functions like `qubit`, but without the Sesh property `!~a == ~!a`.
+pub fn platonic_qubit(a: u64) -> u64 {un_sesh(qubit(a))}
 
 /// Prepares a qubit using a proposition as seed.
 pub fn qubit(a: u64) -> u64 {
