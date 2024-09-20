@@ -604,12 +604,13 @@ pub fn un_sesh(a: u64) -> u64 {
     use rand::rngs::StdRng;
 
     let r = unsafe {&*current::Current::<u64>::new()};
+    let bit = (*r % 64) as u8;
     let mut rng2 = StdRng::seed_from_u64(*r);
     let pat: u64 = rng2.gen();
     let pat2: u64 = rng2.gen();
-    let pat2 = if pat & 1 != pat2 & 1 {not(pat2)} else {pat2};
+    let pat2 = if (pat >> bit) & 1 != (pat2 >> bit) & 1 {not(pat2)} else {pat2};
 
-    if a & 1 == 1 {a ^ pat} else {a ^ pat2}
+    if (a >> bit) & 1 == 1 {a ^ pat} else {a ^ pat2}
 }
 
 /// Restore Sesh property to a proposition.
@@ -621,14 +622,15 @@ pub fn re_sesh(a: u64) -> u64 {
     use rand::rngs::StdRng;
 
     let r = unsafe {&*current::Current::<u64>::new()};
+    let bit = (*r % 64) as u8;
     let mut rng2 = StdRng::seed_from_u64(*r);
     let pat: u64 = rng2.gen();
     let pat2: u64 = rng2.gen();
-    let pat2 = if pat & 1 != pat2 & 1 {not(pat2)} else {pat2};
+    let pat2 = if (pat >> bit) & 1 != (pat2 >> bit) & 1 {not(pat2)} else {pat2};
 
     let a1 = a ^ pat;
     let a2 = a ^ pat2;
-    if a1 & 1 == 1 {a1} else {a2}
+    if (a1 >> bit) & 1 == 1 {a1} else {a2}
 }
 
 /// Prepares a platonic qubit using a proposition as seed.
