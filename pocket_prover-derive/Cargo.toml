@@ -1,6 +1,6 @@
 [package]
 name = "pocket_prover-derive"
-version = "0.8.0"
+version = "0.9.0"
 authors = ["Sven Nilsen <bvssvni@gmail.com>"]
 keywords = ["prover", "solver", "logic", "first-order"]
 description = "Derive procedural macros for `pocket_prover`."
@@ -18,4 +18,4 @@ syn = "0.11.11"
 quote = "0.3.15"
 
 [dev-dependencies]
-pocket_prover = { version = "0.17.0", path = "../" }
+pocket_prover = { version = "0.18.0", path = "../" }
