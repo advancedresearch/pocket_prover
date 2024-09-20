@@ -599,6 +599,8 @@ impl Observable for u64 {
 ///
 /// Sesh is the property that `!~a == ~!a`, which holds for `qubit` (`~`).
 /// Sometimes you want to get rid of this property (see `platonic_qubit`).
+///
+/// For more information, see [paper "Un- and Re-Sesh"](https://github.com/advancedresearch/path_semantics/blob/master/papers-wip2/un-and-re-sesh.pdf).
 pub fn un_sesh(a: u64) -> u64 {
     use rand::{Rng, SeedableRng};
     use rand::rngs::StdRng;
@@ -617,6 +619,8 @@ pub fn un_sesh(a: u64) -> u64 {
 ///
 /// This is the inverse of `un_sesh`.
 /// `re_sesh . un_sesh <=> id`.
+///
+/// For more information, see [paper "Un- and Re-Sesh"](https://github.com/advancedresearch/path_semantics/blob/master/papers-wip2/un-and-re-sesh.pdf).
 pub fn re_sesh(a: u64) -> u64 {
     use rand::{Rng, SeedableRng};
     use rand::rngs::StdRng;
@@ -636,6 +640,8 @@ pub fn re_sesh(a: u64) -> u64 {
 /// Prepares a platonic qubit using a proposition as seed.
 ///
 /// Functions like `qubit`, but without the Sesh property `!~a == ~!a`.
+///
+/// For more information, see [paper](https://github.com/advancedresearch/path_semantics/blob/master/papers-wip2/un-and-re-sesh.pdf).
 pub fn platonic_qubit(a: u64) -> u64 {un_sesh(qubit(a))}
 
 /// Prepares a qubit using a proposition as seed.
